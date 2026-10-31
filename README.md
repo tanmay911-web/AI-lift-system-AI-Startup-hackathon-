@@ -4,6 +4,7 @@
 > *We do not replace elevators — we give them a brain.*
 
 [![Live Demo](https://img.shields.io/badge/🚀_Live_Demo-Open_App-0071e3?style=for-the-badge)](https://app-lime-mu-42.vercel.app/)
+[![Demo Video](https://img.shields.io/badge/🎬_Demo_Video-Watch-ff0000?style=for-the-badge)](#-demo-video)
 [![Source Code](https://img.shields.io/badge/💻_Source_Code-Browse-24292f?style=for-the-badge)](#-source-code)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green?style=for-the-badge)](LICENSE)
 
@@ -18,7 +19,18 @@
 | 🌐 **Live deployed app** | **[https://app-lime-mu-42.vercel.app/](https://app-lime-mu-42.vercel.app/)** |
 | 💻 **Web app code** (`index.html`) | [`index.html`](index.html) |
 | 🖐️ **Python palm detector code** | [`palm_detector.py`](palm_detector.py) |
+| 🎬 **Demo video** | [Watch below ↓](#-demo-video) |
 | 🤖 **AI usage report** | [`ai-usage-report.md`](ai-usage-report.md) |
+
+---
+
+## 🎬 Demo Video
+
+A short walkthrough of the problem, the LiftMind solution, the live Digital Twin app and the palm-gesture door hold in action.
+
+[![Watch the LiftMind demo video](https://img.youtube.com/vi/YOUR_VIDEO_ID/maxresdefault.jpg)](https://www.youtube.com/watch?v=YOUR_VIDEO_ID)
+
+▶️ **[Watch on YouTube](https://www.youtube.com/watch?v=YOUR_VIDEO_ID)**
 
 ---
 
