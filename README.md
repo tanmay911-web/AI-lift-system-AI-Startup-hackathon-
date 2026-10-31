@@ -26,11 +26,11 @@
 
 ## 🎬 Demo Video
 
-A short walkthrough of the problem, the LiftMind solution, the live Digital Twin app and the palm-gesture door hold in action.
+A video explanation of the LiftMind project and its pitch deck: the problem, our solution, the 8 core features, the market and the business model.
 
-[![Watch the LiftMind demo video](https://img.youtube.com/vi/YOUR_VIDEO_ID/maxresdefault.jpg)](https://www.youtube.com/watch?v=YOUR_VIDEO_ID)
+[![Watch the video](https://img.shields.io/badge/▶️_Watch_Video-Google_Drive-4285F4?style=for-the-badge&logo=googledrive&logoColor=white)](YOUR_DRIVE_LINK)
 
-▶️ **[Watch on YouTube](https://www.youtube.com/watch?v=YOUR_VIDEO_ID)**
+▶️ **[Watch the video on Google Drive](YOUR_DRIVE_LINK)**
 
 ---
 
