@@ -1,0 +1,1986 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="color-scheme" content="light dark" />
+<title>LiftMind — Smart Elevator Command Center</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+<style>
+:root{--bg:#f5f5f7;--card:#fff;--ink:#1d1d1f;--ink2:#6e6e73;--ink3:#a1a1a6;--line:rgba(0,0,0,.08);--fill:rgba(120,120,128,.12);--acc:#0071e3;--ok:#248a3d;--warn:#c25400;--bad:#d70015;--info:#0071e3;--shadow:0 1px 2px rgba(0,0,0,.04),0 10px 30px rgba(0,0,0,.05);--door:#e8e8ed;--car:#fff;--glass:rgba(245,245,247,.78)}
+@media(prefers-color-scheme:dark){:root{--bg:#000;--card:#1c1c1e;--ink:#f5f5f7;--ink2:#98989d;--ink3:#636366;--line:rgba(255,255,255,.1);--fill:rgba(120,120,128,.24);--acc:#2997ff;--ok:#30d158;--warn:#ff9f0a;--bad:#ff453a;--info:#64d2ff;--shadow:none;--door:#3a3a3c;--car:#2c2c2e;--glass:rgba(0,0,0,.7)}}
+*{box-sizing:border-box;margin:0}
+html{-webkit-font-smoothing:antialiased}
+body{background:var(--bg);color:var(--ink);font:14px/1.45 -apple-system,BlinkMacSystemFont,"SF Pro Text",Inter,system-ui,sans-serif;font-variant-numeric:tabular-nums;min-height:100vh}
+button,select{font:inherit;color:inherit;cursor:pointer;border:0;background:none}
+.hidden{display:none!important}
+::-webkit-scrollbar{width:8px}::-webkit-scrollbar-thumb{background:var(--fill);border-radius:4px}
+
+header{position:sticky;top:0;z-index:30;background:var(--glass);backdrop-filter:saturate(180%) blur(20px);-webkit-backdrop-filter:saturate(180%) blur(20px);border-bottom:1px solid var(--line)}
+.bar-in{max-width:1280px;margin:auto;padding:10px 24px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.brand{display:flex;align-items:center;gap:10px;font-weight:600;font-size:17px;letter-spacing:-.02em}
+.logo{width:30px;height:30px;border-radius:9px;background:linear-gradient(160deg,#2a2a2e,#0a0a0c);color:#fff;display:grid;place-items:center;font-size:13px}
+.brand small{font-weight:400;color:var(--ink2);font-size:13px;letter-spacing:0}
+.tools{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.pill,.sel{height:32px;padding:0 14px;border-radius:16px;background:var(--fill);font-size:13px;display:inline-flex;align-items:center;gap:6px;transition:.2s}
+.pill:hover,.sel:hover{background:color-mix(in srgb,var(--fill) 70%,var(--ink) 8%)}
+.sel{padding:0 10px 0 12px;color:var(--ink2)}
+.sel select{appearance:none;-webkit-appearance:none;color:var(--ink);font-weight:500;padding-right:4px;outline:0}
+.pill.solid{background:var(--ink);color:var(--bg);font-weight:500}
+.ib{width:32px;height:32px;border-radius:50%;background:var(--fill);display:grid;place-items:center;font-size:13px;transition:.2s}
+.ib:hover{background:color-mix(in srgb,var(--fill) 70%,var(--ink) 8%)}
+
+main{max-width:1280px;margin:auto;padding:20px 24px 48px;display:flex;flex-direction:column;gap:16px}
+.status{display:flex;align-items:center;gap:10px;font-size:13px;color:var(--ink2);min-height:28px}
+.status #bannerText{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.link{color:var(--acc);font-size:13px}.link:hover{opacity:.7}
+.chip{display:inline-flex;align-items:center;height:22px;padding:0 9px;border-radius:11px;font-size:12px;font-weight:500;white-space:nowrap;background:color-mix(in srgb,var(--c,var(--ink2)) 14%,transparent);color:var(--c,var(--ink2))}
+.chip.sm{height:18px;padding:0 7px;font-size:10px;border-radius:9px}
+.ok{--c:var(--ok)}.warn{--c:var(--warn)}.bad{--c:var(--bad)}.info{--c:var(--info)}
+
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.stat{background:var(--card);border-radius:18px;padding:16px 18px;box-shadow:var(--shadow)}
+.stat span{display:block;color:var(--ink2);font-size:12px}
+.stat b{display:block;font-size:26px;font-weight:600;letter-spacing:-.03em;margin-top:2px}
+
+.layout{display:grid;grid-template-columns:minmax(0,1fr) 400px;gap:16px;align-items:start}
+.card{background:var(--card);border-radius:22px;box-shadow:var(--shadow);padding:20px}
+.card h2{font-size:19px;font-weight:600;letter-spacing:-.02em}
+.card .sub{color:var(--ink2);font-size:13px}
+.head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:16px;flex-wrap:wrap}
+
+.cols{display:grid;grid-template-columns:1fr 96px 96px;gap:10px;font-size:12px;color:var(--ink2);text-align:center;padding-bottom:8px}
+.cols span:first-child{text-align:left}
+.building{display:grid;grid-template-columns:1fr 96px 96px;gap:10px;height:456px}
+#floorRowsContainer{display:flex;flex-direction:column}
+.floor{height:76px;display:flex;align-items:center;gap:12px;border-bottom:1px solid var(--line);padding-right:4px;transition:background .3s}
+.floor:last-child{border-bottom:0}
+.fn{font-size:26px;font-weight:600;letter-spacing:-.03em;width:30px;text-align:center;color:var(--ink3);transition:.3s}
+.floor.called .fn{color:var(--acc)}.floor.stretch .fn{color:var(--info)}
+.fi{flex:1;min-width:0}
+.fi b{display:block;font-weight:500;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.fi div{display:flex;gap:6px;margin-top:3px;min-height:18px}
+.fa-row{display:flex;align-items:center;gap:6px}
+.call{height:28px;padding:0 14px;border-radius:14px;background:var(--fill);font-size:13px;font-weight:500;transition:.2s}
+.call:hover{background:color-mix(in srgb,var(--fill) 70%,var(--ink) 8%)}
+.call.on{background:var(--acc);color:#fff}
+.tb{width:28px;height:28px;border-radius:50%;color:var(--ink2);font-size:11px;display:grid;place-items:center;transition:.2s}
+.tb:hover{background:var(--fill);color:var(--ink)}
+.tb.on{background:var(--info);color:#fff}
+
+.shaft{position:relative;border-radius:16px;background:var(--fill);background-image:repeating-linear-gradient(to bottom,transparent 0 75px,var(--line) 75px 76px);overflow:hidden}
+.car{position:absolute;left:6px;right:6px;height:68px;bottom:4px;border-radius:13px;background:var(--car);box-shadow:0 0 0 1px var(--line),0 6px 18px rgba(0,0,0,.14);overflow:hidden;transition:bottom .55s cubic-bezier(.22,1,.36,1),box-shadow .3s}
+.car.sos{animation:sos .8s infinite}.car.pri{animation:pri 1.2s infinite}
+@keyframes sos{50%{box-shadow:0 0 0 2px var(--bad),0 0 22px color-mix(in srgb,var(--bad) 60%,transparent)}}
+@keyframes pri{50%{box-shadow:0 0 0 2px var(--info),0 0 20px color-mix(in srgb,var(--info) 55%,transparent)}}
+.doors{position:absolute;inset:0;display:flex;justify-content:space-between}
+.dp{height:100%;background:var(--door);transition:width .38s cubic-bezier(.4,0,.2,1)}
+.cin{position:relative;height:100%;padding:7px 8px;display:flex;flex-direction:column;justify-content:space-between}
+.cin .r{display:flex;justify-content:space-between;align-items:center}
+.cin .r b{font-size:13px;font-weight:600}
+.pax{font-size:12px;font-weight:500;text-align:center;color:var(--ink2)}
+.bars{display:grid;gap:3px}
+.bar{height:3px;border-radius:2px;background:var(--fill);overflow:hidden}
+.bar i{display:block;height:100%;border-radius:2px;background:var(--acc);transition:width .3s}
+
+details.card{padding:0;margin-top:16px;background:none;box-shadow:none;border-top:1px solid var(--line);border-radius:0}
+details summary{list-style:none;cursor:pointer;padding:14px 2px 4px;font-weight:500;color:var(--ink2);font-size:13px;display:flex;justify-content:space-between}
+details summary::-webkit-details-marker{display:none}
+details[open] summary i{transform:rotate(180deg)}
+details summary i{transition:.2s}
+.sens{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:10px}
+.sc{background:var(--fill);border-radius:16px;padding:14px}
+.sc .t{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;font-weight:600}
+.sl{display:flex;justify-content:space-between;font-size:12px;color:var(--ink2);margin:8px 0 4px}
+.sl b{color:var(--ink);font-weight:500}.sl b.bad{color:var(--bad)}
+.sc .ft{display:flex;justify-content:space-between;font-size:12px;color:var(--ink2);margin-top:10px}
+input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:4px;border-radius:2px;background:var(--line);outline:0}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;height:20px;border-radius:50%;background:#fff;box-shadow:0 0 0 .5px rgba(0,0,0,.12),0 2px 6px rgba(0,0,0,.25);cursor:pointer}
+
+.seg{display:flex;background:var(--fill);border-radius:10px;padding:2px;gap:2px}
+.seg button{flex:1;height:28px;border-radius:8px;font-size:13px;font-weight:500;color:var(--ink2);transition:.2s}
+.seg button.on{background:var(--card);color:var(--ink);box-shadow:0 1px 3px rgba(0,0,0,.14)}
+@media(prefers-color-scheme:dark){.seg button.on{background:#636366;color:#fff}}
+.side{padding:16px}
+.pane{margin-top:16px}
+.list{display:flex;flex-direction:column}
+.row{display:flex;align-items:center;gap:12px;padding:11px 4px;border-bottom:1px solid var(--line);text-align:left;width:100%;transition:.15s;border-radius:10px}
+.row:last-child{border-bottom:0}
+.row:hover{background:var(--fill)}
+.ico{width:34px;height:34px;border-radius:10px;display:grid;place-items:center;font-size:14px;color:#fff;background:var(--c,var(--acc));flex:none}
+.row div b{display:block;font-weight:500}.row div span{font-size:12px;color:var(--ink2)}
+.row>i{margin-left:auto;color:var(--ink3);font-size:11px}
+
+.keys{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:16px 0 12px}
+.key{position:relative;height:60px;border-radius:16px;background:var(--fill);font-size:22px;font-weight:500;transition:.15s}
+.key:active{transform:scale(.96)}.key:hover{background:color-mix(in srgb,var(--fill) 70%,var(--ink) 8%)}
+.key.q{background:var(--acc);color:#fff}
+.key em{position:absolute;top:6px;right:9px;font-style:normal;font-size:11px;font-weight:600;opacity:.9}
+.note{font-size:13px;color:var(--ink2);padding:12px 14px;background:var(--fill);border-radius:12px;margin-bottom:12px}
+.note b{color:var(--ink);font-weight:500}
+.btns{display:flex;gap:8px}
+.btn{flex:1;height:40px;border-radius:12px;background:var(--fill);font-weight:500;transition:.2s}
+.btn.danger{background:color-mix(in srgb,var(--bad) 13%,transparent);color:var(--bad)}
+.btn.danger.solid{background:var(--bad);color:#fff;animation:sos .8s infinite}
+.btn.sm{flex:none;padding:0 16px}
+
+#aiDecisionTerminal{max-height:460px;overflow-y:auto;display:flex;flex-direction:column}
+.log{display:flex;gap:10px;padding:10px 2px;border-bottom:1px solid var(--line);font-size:13px}
+.log>i{width:7px;height:7px;border-radius:50%;margin-top:6px;flex:none;background:var(--c,var(--acc))}
+.log span{font-size:11px;color:var(--ink3)}.log p{line-height:1.4}
+
+.eye{background:#000;border-radius:16px;overflow:hidden;position:relative;height:200px}
+.eye canvas,.eye video{width:100%;height:100%;display:block}
+.eye video{position:absolute;inset:0;object-fit:cover;opacity:.55}
+.eye canvas{position:relative}
+.eye .tag{position:absolute;top:10px;left:10px;font-size:11px;color:#fff;background:rgba(255,255,255,.16);backdrop-filter:blur(10px);padding:3px 9px;border-radius:10px}
+#webcamHintOverlay{position:absolute;left:10px;right:10px;bottom:10px;font-size:11px;color:#fff;background:rgba(0,0,0,.6);padding:6px 10px;border-radius:10px;display:flex;justify-content:space-between}
+.duo{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:12px 0}
+.duo div{background:var(--fill);border-radius:14px;padding:12px}
+.duo span{font-size:12px;color:var(--ink2);display:block}.duo b{font-weight:600;display:block;margin-top:2px;font-size:14px}
+
+.modal{position:fixed;inset:0;z-index:50;background:rgba(0,0,0,.4);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);display:flex;align-items:center;justify-content:center;padding:20px}
+.sheet{background:var(--card);border-radius:26px;width:100%;max-width:700px;max-height:88vh;display:flex;flex-direction:column;box-shadow:0 30px 80px rgba(0,0,0,.35);overflow:hidden}
+.sheet header{position:static;background:none;backdrop-filter:none;border:0;display:flex;justify-content:space-between;align-items:center;padding:22px 24px 12px;gap:10px}
+.sheet h3{font-size:21px;font-weight:600;letter-spacing:-.02em}
+#qaTestResultsContainer{padding:4px 24px 24px;overflow-y:auto}
+.t{display:flex;gap:14px;align-items:flex-start;padding:14px 0;border-bottom:1px solid var(--line)}
+.t:last-child{border-bottom:0}
+.t .ck{width:24px;height:24px;border-radius:50%;display:grid;place-items:center;font-size:11px;color:#fff;background:var(--ok);flex:none}
+.t .ck.f{background:var(--bad)}
+.t div{flex:1;min-width:0}.t b{font-weight:500;display:block}.t p{font-size:12px;color:var(--ink2);margin-top:2px}
+
+@media(max-width:1020px){.layout{grid-template-columns:1fr}.stats{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:640px){main,.bar-in{padding-left:14px;padding-right:14px}.cols,.building{grid-template-columns:1fr 72px 72px}.sens{grid-template-columns:1fr}.fi div,.brand small{display:none}.tb:nth-child(-n+2){display:none}}
+</style>
+</head>
+<body>
+
+<!-- Top Navigation Header -->
+<header><div class="bar-in">
+  <div class="brand"><div class="logo"><i class="fa-solid fa-elevator"></i></div>LiftMind <small>Command Center</small></div>
+  <div class="tools">
+    <label class="sel" title="Traffic profile"><i class="fa-regular fa-clock"></i>
+      <select id="scheduleSelect" onchange="handleScheduleChange(this.value)">
+        <option value="NORMAL">Balanced</option>
+        <option value="MORNING_RUSH">Morning rush · 8:55</option>
+        <option value="MIDDAY_LUNCH">Lunch · 1:15</option>
+        <option value="EVENING_EXIT">Evening exit · 4:30</option>
+      </select></label>
+    <button id="speedBtn" class="pill" onclick="toggleSimSpeed()" title="Simulation speed"><i class="fa-solid fa-gauge-high"></i><span id="speedLabel">1×</span></button>
+    <button id="audioBtn" class="ib" onclick="toggleAudio()" title="Sound"><i id="audioIcon" class="fa-solid fa-volume-high"></i></button>
+    <button class="pill solid" onclick="openTestModalAndRun()"><i class="fa-solid fa-circle-check"></i>Diagnostics</button>
+  </div>
+</div></header>
+
+<!-- Main Workspace -->
+<main>
+  <!-- Status Banner -->
+  <div class="status">
+    <span id="bannerBadge" class="chip ok">Live</span>
+    <span id="bannerText">All systems nominal. Pick a demo or interact with the building directly.</span>
+    <button class="link" onclick="resetFullSimulation()">Reset</button>
+  </div>
+
+  <!-- Live ROI & Telemetry Cards -->
+  <div class="stats">
+    <div class="stat"><span>Phantom stops avoided</span><b id="roiPhantomCount">14</b></div>
+    <div class="stat"><span>Smart operations</span><b id="roiSmartOpsCount">28</b></div>
+    <div class="stat"><span>Energy saved</span><b id="roiEnergyKwh">42.5 kWh</b></div>
+    <div class="stat"><span>Annual savings</span><b id="roiAnnualInr">₹1,84,500</b></div>
+  </div>
+
+  <!-- 2-Column Layout: Digital Twin Building + Tabbed Control Sidebar -->
+  <div class="layout">
+    <section class="card">
+      <div class="head">
+        <div><h2>Building</h2><div class="sub">Live digital twin · two lifts · six floors</div></div>
+        <button class="pill" onclick="triggerPalmGestureHold()"><i class="fa-solid fa-hand"></i>Hold doors</button>
+      </div>
+      <div class="cols"><span>Floors</span><span>Lift A</span><span>Lift B</span></div>
+      <div class="building">
+        <div id="floorRowsContainer"></div>
+        <div class="shaft" id="shaftA"></div>
+        <div class="shaft" id="shaftB"></div>
+      </div>
+      <details class="card"><summary>Sensor simulation <i class="fa-solid fa-chevron-down"></i></summary>
+        <div class="sens" id="sensors"></div>
+      </details>
+    </section>
+
+    <aside class="card side">
+      <div class="seg main">
+        <button data-t="demos" onclick="showTab('demos')">Demos</button>
+        <button data-t="cabin" onclick="showTab('cabin')">Cabin</button>
+        <button data-t="log" onclick="showTab('log')">Activity</button>
+        <button data-t="vision" onclick="showTab('vision')">Vision</button>
+      </div>
+
+      <!-- Tab 1: 8 Judge Demo Scenarios -->
+      <div class="pane" id="pane-demos"><div class="list" id="demoList"></div></div>
+
+      <!-- Tab 2: In-Cabin Keypad & Emergency Controls -->
+      <div class="pane hidden" id="pane-cabin">
+        <div class="seg"><button id="tabCabinA" onclick="selectActiveCabin('A')">Cabin A</button><button id="tabCabinB" onclick="selectActiveCabin('B')">Cabin B</button></div>
+        <div class="keys" id="cabinKeypadGrid"></div>
+        <div class="note" id="headcountForecastText"></div>
+        <div class="btns">
+          <button id="distressToggleBtn" class="btn danger" onclick="toggleCabinDistress()"><span id="distressBtnLabel">Simulate emergency</span></button>
+          <button class="btn sm" onclick="clearSelectedCabin()">Clear</button>
+        </div>
+      </div>
+
+      <!-- Tab 3: Live AI Decision Log -->
+      <div class="pane hidden" id="pane-log">
+        <div class="head" style="margin-bottom:4px"><h2 style="font-size:16px">AI decisions</h2><button class="link" onclick="clearAiLogs()">Clear</button></div>
+        <div id="aiDecisionTerminal"></div>
+      </div>
+
+      <!-- Tab 4: Edge Vision HUD & Webcam Integration -->
+      <div class="pane hidden" id="pane-vision">
+        <div class="eye">
+          <video id="realWebcamVideo" autoplay playsinline muted class="hidden"></video>
+          <canvas id="cvHudCanvas"></canvas>
+          <span class="tag">On-device vision</span>
+          <div id="webcamHintOverlay" class="hidden"><span>Wave your hand to hold the doors</span><b id="motionMeter">Motion: 0%</b></div>
+        </div>
+        <div class="duo">
+          <div><span>Hallway</span><b id="cvHallwayStatus">Scanning</b></div>
+          <div><span>Cabin</span><b id="cvCabinStatus">Nominal</b></div>
+        </div>
+        <button id="webcamToggleBtn" class="btn" style="width:100%" onclick="toggleRealWebcam()">Use camera</button>
+      </div>
+    </aside>
+  </div>
+</main>
+
+<!-- Diagnostics Modal (Automated QA Suite for All 8 Features) -->
+<div id="qaTestModal" class="modal hidden" onclick="if(event.target===this)closeTestModal()">
+  <div class="sheet">
+    <header>
+      <div><h3>Diagnostics</h3><div class="sub" style="color:var(--ink2);font-size:13px">Verifies all eight dispatch features <span id="testDurationLabel"></span></div></div>
+      <div class="tools"><span id="testSummaryBadge" class="chip ok"></span><button class="pill" onclick="runAllAutomatedTests()">Run again</button><button class="ib" onclick="closeTestModal()"><i class="fa-solid fa-xmark"></i></button></div>
+    </header>
+    <div id="qaTestResultsContainer"></div>
+  </div>
+</div>
+
+<!-- Unified Simulation Engine, UI Renderer & Diagnostics Script -->
+<script>
+/*************************************************************************
+ * 1. CORE STATE ARCHITECTURE & FLOOR DEFINITIONS
+ *************************************************************************/
+const DEMOS = [
+  [1, 'Load balancing',    'A full lift hands its call to the other', 'fa-scale-balanced',             'var(--acc)'],
+  [2, 'Stretcher priority','Medical calls override the queue',        'fa-truck-medical',              'var(--info)'],
+  [3, 'Phantom calls',     'Walk-aways cancel after 3 seconds',       'fa-person-walking-arrow-right', '#ff9f0a'],
+  [4, 'Peak staging',      'Pre-parks lifts for the evening rush',    'fa-clock',                      '#5e5ce6'],
+  [5, 'Smart bypass',      'Weight is fine, cabin is full — skip',    'fa-boxes-stacked',              '#30b0c7'],
+  [6, 'Cabin emergency',   'Collapse detected, siren on',             'fa-triangle-exclamation',       'var(--bad)'],
+  [7, 'Headcount',         'Multi-tap reveals who exits where',       'fa-users',                      '#34c759'],
+  [8, 'Palm hold',         'An open palm keeps doors open',           'fa-hand',                       '#af52de']
+];
+
+const FLOOR_NAMES = {
+  6: 'Executive',
+  5: 'R&D Labs',
+  4: 'Cafeteria',
+  3: 'Outpatient',
+  2: 'Admin & IT',
+  1: 'Ground lobby'
+};
+
+// Global Simulation Configuration
+let simConfig = {
+  scheduleProfile: 'NORMAL', // NORMAL | MORNING_RUSH | MIDDAY_LUNCH | EVENING_EXIT
+  speedMultiplier: 1,
+  audioEnabled: true,
+  activeCabinTab: 'A',
+  realWebcamActive: false,
+  phantomSavedCount: 14,
+  smartOpsCount: 28,
+  energySavedKwh: 42.5,
+  annualSavingsInr: 184500
+};
+
+// Factory function to create clean Floor states (1 to 6)
+function createInitialFloors() {
+  const floors = {};
+  for (let f = 1; f <= 6; f++) {
+    floors[f] = {
+      floor: f,
+      callActive: false,
+      waitingCount: 0,
+      hasStretcher: false,
+      phantomTimer: null // null when inactive, countdown in seconds (3.0 -> 0) when callActive && waitingCount === 0
+    };
+  }
+  return floors;
+}
+
+// Factory function to create a Lift state object
+function createLiftState(id, startFloor = 1) {
+  return {
+    id: id,
+    currentFloor: startFloor,
+    status: 'IDLE', // IDLE | MOVING_UP | MOVING_DOWN | DOORS_OPEN | DOORS_CLOSING | PALM_HOLD | PRIORITY_PREEMPTION | EMERGENCY_STOP
+    doorOpenPct: 0, // 0 = closed, 100 = fully open
+    doorTimer: 0,   // seconds remaining in current door state
+    moveTimer: 0,   // seconds remaining for current 1-floor travel step (0.50s)
+    keypadBufferTimer: 0, // 1.0s multi-tap buffer so rapid keypad taps register cleanly before dispatch
+    weightPct: 0,   // Load cell sensor % ( >= 85% triggers full)
+    spacePct: 0,    // Overhead CV floor space % ( >= 90% triggers full/bypass)
+    cabinQueue: [], // Internal cabin destination calls (never bypassed by F5)
+    hallQueue: [],  // Assigned external floor calls
+    destHeadcounts: { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0 }, // Feature 7 multi-tap map
+    distressActive: false, // Feature 6 passenger collapse state
+    priorityTarget: null,  // Feature 2 stretcher target floor
+    stagingTarget: null    // Feature 4 predictive parking target floor
+  };
+}
+
+let floorsState = createInitialFloors();
+let liftsState = {
+  A: createLiftState('A', 1),
+  B: createLiftState('B', 1)
+};
+
+/*************************************************************************
+ * 2. WEB AUDIO API SYNTHESIZER (CHIMES, DOOR SLIDES, EMERGENCY SIREN)
+ *************************************************************************/
+let audioCtx = null;
+let sirenInterval = null;
+let lastDingTimestamp = 0;
+
+function ensureAudioContext() {
+  if (!simConfig.audioEnabled) return null;
+  if (!audioCtx) {
+    const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+    if (AudioContextClass) audioCtx = new AudioContextClass();
+  }
+  if (audioCtx && audioCtx.state === 'suspended') {
+    audioCtx.resume();
+  }
+  return audioCtx;
+}
+
+function playSoundEffect(type) {
+  if (!simConfig.audioEnabled) return;
+  try {
+    const ctx = ensureAudioContext();
+    if (!ctx) return;
+    const now = ctx.currentTime;
+
+    if (type === 'DING') {
+      const perfNow = performance.now();
+      if (perfNow - lastDingTimestamp < 320) return;
+      lastDingTimestamp = perfNow;
+
+      const osc1 = ctx.createOscillator();
+      const gain1 = ctx.createGain();
+      osc1.type = 'sine';
+      osc1.frequency.setValueAtTime(783.99, now); // G5
+      osc1.frequency.setValueAtTime(659.25, now + 0.16); // E5
+      gain1.gain.setValueAtTime(0.12, now);
+      gain1.gain.exponentialRampToValueAtTime(0.001, now + 0.55);
+      osc1.connect(gain1);
+      gain1.connect(ctx.destination);
+      osc1.start(now);
+      osc1.stop(now + 0.55);
+    } else if (type === 'PALM_HOLD') {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = 'triangle';
+      osc.frequency.setValueAtTime(520, now);
+      osc.frequency.exponentialRampToValueAtTime(880, now + 0.22);
+      gain.gain.setValueAtTime(0.14, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.25);
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start(now);
+      osc.stop(now + 0.25);
+    } else if (type === 'PRIORITY') {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = 'sawtooth';
+      osc.frequency.setValueAtTime(660, now);
+      osc.frequency.setValueAtTime(880, now + 0.12);
+      gain.gain.setValueAtTime(0.1, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.3);
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start(now);
+      osc.stop(now + 0.3);
+    } else if (type === 'SIREN_PULSE') {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = 'sawtooth';
+      osc.frequency.setValueAtTime(440, now);
+      osc.frequency.linearRampToValueAtTime(880, now + 0.28);
+      gain.gain.setValueAtTime(0.14, now);
+      gain.gain.exponentialRampToValueAtTime(0.01, now + 0.32);
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start(now);
+      osc.stop(now + 0.32);
+    }
+  } catch (e) {
+    // Ignore audio errors on restricted autoplay
+  }
+}
+
+function updateSirenLoop() {
+  const anyDistress = liftsState.A.distressActive || liftsState.B.distressActive;
+  if (anyDistress && !sirenInterval) {
+    playSoundEffect('SIREN_PULSE');
+    sirenInterval = setInterval(() => {
+      if (liftsState.A.distressActive || liftsState.B.distressActive) {
+        playSoundEffect('SIREN_PULSE');
+      } else {
+        clearInterval(sirenInterval);
+        sirenInterval = null;
+      }
+    }, 650);
+  } else if (!anyDistress && sirenInterval) {
+    clearInterval(sirenInterval);
+    sirenInterval = null;
+  }
+}
+
+/*************************************************************************
+ * 3. PURE DETERMINISTIC AI DISPATCH FUNCTIONS (SHARED BY SIM & QA TESTS)
+ *************************************************************************/
+
+/**
+ * Evaluates Feature 5 (Dual-Modal Capacity Check):
+ * A lift is considered at full capacity for external hall calls if
+ * Weight >= 85% OR Overhead CV Floor Space >= 90%.
+ */
+function isLiftFullForHallCalls(lift) {
+  return lift.weightPct >= 85 || lift.spacePct >= 90;
+}
+
+/**
+ * Evaluates whether a lift is specifically in "Dual-Modal Space Bypass"
+ * (Weight is within limit < 85%, but CV Space >= 90% due to luggage/crowding).
+ */
+function isLiftInCvSpaceBypass(lift) {
+  return lift.weightPct < 85 && lift.spacePct >= 90;
+}
+
+/**
+ * Feature 1 (Dynamic Multi-Car Load Balancing) + Hall Call Assignment Engine:
+ * Given a floor call on `targetFloor`, selects the optimal lift (A or B).
+ * If one lift is full (Weight >= 85% or CV Space >= 90%) or in EMERGENCY_STOP,
+ * automatically routes the call to the secondary operational lift.
+ */
+function assignHallCallToOptimalLift(lifts, targetFloor) {
+  const liftA = lifts.A;
+  const liftB = lifts.B;
+
+  const aAvailable = !liftA.distressActive && !isLiftFullForHallCalls(liftA) && liftA.status !== 'PRIORITY_PREEMPTION';
+  const bAvailable = !liftB.distressActive && !isLiftFullForHallCalls(liftB) && liftB.status !== 'PRIORITY_PREEMPTION';
+
+  if (!aAvailable && bAvailable) {
+    if (!liftB.hallQueue.includes(targetFloor)) liftB.hallQueue.push(targetFloor);
+    return {
+      assignedLift: 'B',
+      reason: isLiftFullForHallCalls(liftA)
+        ? `F1 LOAD BALANCE: Lift A Full (WT:${liftA.weightPct}%, CV:${liftA.spacePct}%) → Delegated Floor ${targetFloor} call to Lift B`
+        : `Lift A unavailable → Delegated Floor ${targetFloor} call to Lift B`
+    };
+  }
+
+  if (aAvailable && !bAvailable) {
+    if (!liftA.hallQueue.includes(targetFloor)) liftA.hallQueue.push(targetFloor);
+    return {
+      assignedLift: 'A',
+      reason: isLiftFullForHallCalls(liftB)
+        ? `F1 LOAD BALANCE: Lift B Full (WT:${liftB.weightPct}%, CV:${liftB.spacePct}%) → Delegated Floor ${targetFloor} call to Lift A`
+        : `Lift B unavailable → Delegated Floor ${targetFloor} call to Lift A`
+    };
+  }
+
+  if (aAvailable && bAvailable) {
+    const distA = Math.abs(liftA.currentFloor - targetFloor) + liftA.hallQueue.length;
+    const distB = Math.abs(liftB.currentFloor - targetFloor) + liftB.hallQueue.length;
+    const chosen = distA <= distB ? liftA : liftB;
+    if (!chosen.hallQueue.includes(targetFloor)) chosen.hallQueue.push(targetFloor);
+    return {
+      assignedLift: chosen.id,
+      reason: `AI Dispatch assigned Floor ${targetFloor} call to nearest available Lift ${chosen.id}`
+    };
+  }
+
+  return {
+    assignedLift: null,
+    reason: `Both lifts currently at capacity or preempted; Floor ${targetFloor} queued in landing memory.`
+  };
+}
+
+/**
+ * Feature 2 (Computer Vision Stretcher Priority Preemption):
+ * Assigns the closest non-distressed lift to immediately preempt its regular
+ * queue and travel non-stop to `stretcherFloor`.
+ */
+function applyStretcherPreemption(lifts, stretcherFloor) {
+  const candidates = [lifts.A, lifts.B].filter(l => !l.distressActive);
+  if (candidates.length === 0) return null;
+
+  candidates.sort((a, b) => Math.abs(a.currentFloor - stretcherFloor) - Math.abs(b.currentFloor - stretcherFloor));
+  const chosen = candidates[0];
+
+  chosen.status = 'PRIORITY_PREEMPTION';
+  chosen.priorityTarget = stretcherFloor;
+  const otherLift = chosen.id === 'A' ? lifts.B : lifts.A;
+  if (!otherLift.distressActive && !isLiftFullForHallCalls(otherLift)) {
+    chosen.hallQueue.forEach(f => {
+      if (f !== stretcherFloor && !otherLift.hallQueue.includes(f)) {
+        otherLift.hallQueue.push(f);
+      }
+    });
+  }
+  chosen.hallQueue = [stretcherFloor];
+  return chosen.id;
+}
+
+/**
+ * Feature 3 (Phantom Call Cancellation Step):
+ * Evaluates a floor with an active call. If `waitingCount === 0` and no stretcher,
+ * advances the countdown by `dtSeconds`. Cancels the call when timer <= 0.
+ */
+function stepPhantomCallVerification(floorObj, lifts, dtSeconds) {
+  if (!floorObj.callActive || floorObj.hasStretcher) {
+    floorObj.phantomTimer = null;
+    return { cancelled: false };
+  }
+
+  if (floorObj.waitingCount === 0) {
+    if (floorObj.phantomTimer === null) {
+      floorObj.phantomTimer = 3.0;
+    } else {
+      floorObj.phantomTimer = Math.max(0, +(floorObj.phantomTimer - dtSeconds).toFixed(2));
+    }
+
+    if (floorObj.phantomTimer <= 0) {
+      floorObj.callActive = false;
+      floorObj.phantomTimer = null;
+      ['A', 'B'].forEach(id => {
+        lifts[id].hallQueue = lifts[id].hallQueue.filter(f => f !== floorObj.floor);
+      });
+      return { cancelled: true, floor: floorObj.floor };
+    }
+  } else {
+    floorObj.phantomTimer = null;
+  }
+  return { cancelled: false };
+}
+
+/**
+ * Feature 4 (Predictive Floor Staging Targets):
+ * Returns target staging floors for Lift A and Lift B based on schedule profile.
+ */
+function getPredictiveStagingTargets(profile) {
+  switch (profile) {
+    case 'MORNING_RUSH':
+      return { A: 1, B: 1, label: '08:55 AM Morning Rush → Staging Lift A & Lift B at Ground Lobby (Flr 1)' };
+    case 'MIDDAY_LUNCH':
+      return { A: 1, B: 4, label: '01:15 PM Midday Canteen Flow → Staging Lift A at Flr 1 & Lift B at Flr 4' };
+    case 'EVENING_EXIT':
+      return { A: 6, B: 5, label: '04:30 PM Campus/Office Exit Rush → Staging Lift A at Flr 6 & Lift B at Flr 5' };
+    default:
+      return { A: null, B: null, label: 'Balanced Mode — Lifts park at last destination' };
+  }
+}
+
+/**
+ * Feature 6 (In-Cabin Distress Trigger):
+ * Immediately locks the lift into EMERGENCY_STOP at its current floor with doors open.
+ */
+function triggerLiftDistressState(lift) {
+  lift.distressActive = true;
+  lift.status = 'EMERGENCY_STOP';
+  lift.doorOpenPct = 100;
+  lift.doorTimer = 999;
+  lift.priorityTarget = null;
+  return {
+    liftId: lift.id,
+    haltedFloor: lift.currentFloor,
+    sirenActive: true
+  };
+}
+
+/**
+ * Feature 7 (Multi-Tap Destination Headcount Registration):
+ * Registers a tap on `destFloor` inside `lift`, increments `destHeadcounts[destFloor]`,
+ * updates weight/CV space, and returns the clearance forecast at `destFloor`.
+ */
+function registerDestinationTap(lift, destFloor) {
+  lift.destHeadcounts[destFloor] = (lift.destHeadcounts[destFloor] || 0) + 1;
+  if (!lift.cabinQueue.includes(destFloor)) {
+    lift.cabinQueue.push(destFloor);
+  }
+  lift.weightPct = Math.min(100, lift.weightPct + 12);
+  lift.spacePct = Math.min(100, lift.spacePct + 18);
+
+  const countForFloor = lift.destHeadcounts[destFloor];
+  const freedSpacePct = Math.min(lift.spacePct, countForFloor * 18);
+  const projectedSpaceAfter = Math.max(0, lift.spacePct - freedSpacePct);
+
+  return {
+    floor: destFloor,
+    headcount: countForFloor,
+    freedSpacePct: freedSpacePct,
+    projectedSpaceAfter: projectedSpaceAfter
+  };
+}
+
+/**
+ * Feature 8 (Hallway Palm-Gesture Door Hold):
+ * Immediately reverses doors to 100% open (`PALM_HOLD`) and sets a 5.0-second hold timer.
+ */
+function applyPalmGestureDoorHold(lift) {
+  lift.status = 'PALM_HOLD';
+  lift.doorOpenPct = 100;
+  lift.doorTimer = 5.0;
+  return {
+    liftId: lift.id,
+    floor: lift.currentFloor,
+    newStatus: lift.status,
+    holdSeconds: lift.doorTimer
+  };
+}
+
+/*************************************************************************
+ * 4. REAL-TIME SIMULATION ENGINE LOOP (RUNS EVERY 250ms)
+ *************************************************************************/
+function showTab(t) {
+  document.querySelectorAll('.pane').forEach(p => p.classList.toggle('hidden', p.id !== 'pane-' + t));
+  document.querySelectorAll('.seg.main button').forEach(b => b.classList.toggle('on', b.dataset.t === t));
+  if (t === 'vision') {
+    drawCvHudCanvas();
+  }
+}
+
+function appendAiLog(message, category = 'INFO') {
+  const term = document.getElementById('aiDecisionTerminal');
+  if (!term) return;
+  const c = {
+    EMERGENCY: 'var(--bad)',
+    PRIORITY: 'var(--info)',
+    GESTURE: 'var(--info)',
+    SAVINGS: 'var(--ok)'
+  }[category] || 'var(--acc)';
+  const d = document.createElement('div');
+  d.className = 'log';
+  d.style.setProperty('--c', c);
+  d.innerHTML = `<i></i><div><span>${new Date().toTimeString().split(' ')[0]}</span><p>${message}</p></div>`;
+  term.prepend(d);
+  while (term.children.length > 40) term.removeChild(term.lastChild);
+}
+
+function clearAiLogs() {
+  const t = document.getElementById('aiDecisionTerminal');
+  if (t) t.innerHTML = '';
+  appendAiLog('Log cleared. Monitoring 6 floors and 2 lifts.');
+}
+
+function setBanner(type, text) {
+  const b = document.getElementById('bannerBadge');
+  const t = document.getElementById('bannerText');
+  if (!b || !t) return;
+  t.textContent = text;
+  const m = {
+    EMERGENCY: ['bad', 'Emergency'],
+    GESTURE: ['info', 'Door hold'],
+    PRIORITY: ['info', 'Priority']
+  }[type] || ['ok', 'Live'];
+  b.className = 'chip ' + m[0];
+  b.textContent = m[1];
+}
+
+function simulationTick() {
+  const dt = 0.25 * simConfig.speedMultiplier;
+
+  // 1. Check Feature 3 (Phantom Call Cancellation) across all 6 floors
+  for (let f = 1; f <= 6; f++) {
+    const flr = floorsState[f];
+    const res = stepPhantomCallVerification(flr, liftsState, dt);
+    if (res.cancelled) {
+      simConfig.phantomSavedCount += 1;
+      simConfig.energySavedKwh = +(simConfig.energySavedKwh + 0.18).toFixed(2);
+      simConfig.annualSavingsInr += 450;
+      setBanner(
+        'ONLINE',
+        `F3 PHANTOM CALL CANCELLED: Floor ${f} empty for 3.0s → Call dropped without moving lift (+0.18 kWh & ₹450 saved).`
+      );
+      appendAiLog(
+        `F3 PHANTOM CALL CANCELLED: Floor ${f} landing empty for 3.0s → Dropped stop & saved 0.18 kWh`,
+        'SAVINGS'
+      );
+    }
+  }
+
+  // 2. Ensure any unassigned active floor calls are routed via Feature 1
+  for (let f = 1; f <= 6; f++) {
+    const flr = floorsState[f];
+    if (flr.hasStretcher) {
+      const alreadyPreempted =
+        (liftsState.A.status === 'PRIORITY_PREEMPTION' && liftsState.A.priorityTarget === f) ||
+        (liftsState.B.status === 'PRIORITY_PREEMPTION' && liftsState.B.priorityTarget === f);
+      if (!alreadyPreempted) {
+        const assignedId = applyStretcherPreemption(liftsState, f);
+        if (assignedId) {
+          playSoundEffect('PRIORITY');
+          appendAiLog(
+            `F2 STRETCHER PRIORITY OVERRIDE: Medical stretcher detected on Floor ${f} → Lift ${assignedId} bypassing regular stops!`,
+            'PRIORITY'
+          );
+        }
+      }
+    } else if (flr.callActive && flr.waitingCount > 0) {
+      const inA = liftsState.A.hallQueue.includes(f);
+      const inB = liftsState.B.hallQueue.includes(f);
+      if (!inA && !inB) {
+        const assignment = assignHallCallToOptimalLift(liftsState, f);
+        if (assignment.assignedLift) {
+          appendAiLog(assignment.reason, 'INFO');
+        }
+      }
+    }
+  }
+
+  // 3. Step each Lift state machine (Lift A & Lift B)
+  ['A', 'B'].forEach(id => {
+    stepSingleLift(liftsState[id], dt);
+  });
+
+  // 4. Refresh UI
+  updateSirenLoop();
+  renderAllUI();
+}
+
+function stepSingleLift(lift, dt) {
+  // Priority 0: Feature 6 In-Cabin Distress Halt
+  if (lift.distressActive) {
+    lift.status = 'EMERGENCY_STOP';
+    lift.doorOpenPct = 100;
+    return;
+  }
+
+  // Allow a brief multi-tap buffer window when user is actively tapping the in-cabin keypad
+  if (lift.keypadBufferTimer > 0) {
+    lift.keypadBufferTimer = Math.max(0, +(lift.keypadBufferTimer - dt).toFixed(2));
+    return;
+  }
+
+  // Handle open/closing/palm-hold door timers
+  if (lift.status === 'PALM_HOLD' || lift.status === 'DOORS_OPEN') {
+    lift.doorOpenPct = 100;
+    lift.doorTimer -= dt;
+    if (lift.doorTimer <= 0) {
+      lift.status = 'DOORS_CLOSING';
+      lift.doorTimer = 1.75;
+    }
+    return;
+  }
+
+  if (lift.status === 'DOORS_CLOSING') {
+    lift.doorTimer -= dt;
+    lift.doorOpenPct = Math.max(0, Math.round((lift.doorTimer / 1.75) * 100));
+    if (lift.doorTimer <= 0) {
+      lift.doorOpenPct = 0;
+      lift.status = 'IDLE';
+    }
+    return;
+  }
+
+  // Wait for active 1-floor physical travel transition (0.55s) to finish before next step or arrival
+  if (lift.moveTimer > 0) {
+    lift.moveTimer = Math.max(0, +(lift.moveTimer - dt).toFixed(2));
+    if (lift.moveTimer > 0) {
+      return;
+    }
+  }
+
+  // Determine primary target floor for this lift
+  let targetFloor = null;
+
+  // Priority 1: Feature 2 Stretcher Preemption
+  if (lift.priorityTarget !== null) {
+    targetFloor = lift.priorityTarget;
+    lift.status = 'PRIORITY_PREEMPTION';
+  } else {
+    // Feature 5: If lift is full (Weight >= 85% OR CV Space >= 90%), purge/delegate external hall calls
+    if (isLiftFullForHallCalls(lift) && lift.hallQueue.length > 0) {
+      const skippedFloors = [...lift.hallQueue];
+      lift.hallQueue = [];
+      const otherLift = lift.id === 'A' ? liftsState.B : liftsState.A;
+      skippedFloors.forEach(sf => {
+        if (!otherLift.distressActive && !isLiftFullForHallCalls(otherLift) && !otherLift.hallQueue.includes(sf)) {
+          otherLift.hallQueue.push(sf);
+        }
+      });
+      simConfig.smartOpsCount += 1;
+      if (isLiftInCvSpaceBypass(lift)) {
+        appendAiLog(
+          `F5 DUAL-MODAL BYPASS: Lift ${lift.id} Weight OK (${lift.weightPct}%), but CV Space Full (${lift.spacePct}%) → Skipping Hall Floor(s) ${skippedFloors.join(', ')} & delegating to Lift ${otherLift.id}`,
+          'SAVINGS'
+        );
+      } else {
+        appendAiLog(
+          `F1/F5 CAPACITY BYPASS: Lift ${lift.id} at capacity → Rerouted Hall Floor(s) ${skippedFloors.join(', ')} to Lift ${otherLift.id}`,
+          'INFO'
+        );
+      }
+    }
+
+    // Feature 3 Guard: Hold physical dispatch/arrival for unverified 0-passenger hall calls while phantomTimer counts down
+    const verifiedHallQueue = lift.hallQueue.filter(f => {
+      const flr = floorsState[f];
+      if (!flr || !flr.callActive) return false;
+      if (flr.waitingCount === 0 && !flr.hasStretcher) return false;
+      return true;
+    });
+
+    // Combine internal cabin destinations and CV-verified external hall calls
+    const combinedTargets = [...new Set([...lift.cabinQueue, ...verifiedHallQueue])];
+    if (combinedTargets.length > 0) {
+      combinedTargets.sort((a, b) => Math.abs(a - lift.currentFloor) - Math.abs(b - lift.currentFloor));
+      targetFloor = combinedTargets[0];
+    } else if (lift.stagingTarget !== null && lift.currentFloor !== lift.stagingTarget) {
+      // Priority 5: Feature 4 Predictive Floor Staging when idle
+      targetFloor = lift.stagingTarget;
+    }
+  }
+
+  if (targetFloor === null) {
+    lift.status = 'IDLE';
+    lift.doorOpenPct = 0;
+    return;
+  }
+
+  // If the car has reached targetFloor (after completing its moveTimer glide), process arrival
+  if (lift.currentFloor === targetFloor) {
+    handleLiftArrivalAtFloor(lift, targetFloor);
+    return;
+  }
+
+  // Move 1 floor toward targetFloor and set 0.55s travel timer so CSS transition & active buttons remain visible
+  if (targetFloor > lift.currentFloor) {
+    if (lift.status !== 'PRIORITY_PREEMPTION') lift.status = 'MOVING_UP';
+    const nextFloor = lift.currentFloor + 1;
+    if (
+      nextFloor !== targetFloor &&
+      floorsState[nextFloor].callActive &&
+      isLiftFullForHallCalls(lift) &&
+      !lift.cabinQueue.includes(nextFloor)
+    ) {
+      appendAiLog(
+        `F5 BYPASS IN MOTION: Lift ${lift.id} (WT:${lift.weightPct}%, CV:${lift.spacePct}%) bypassed Floor ${nextFloor} landing call non-stop.`,
+        'SAVINGS'
+      );
+      simConfig.smartOpsCount += 1;
+    }
+    lift.currentFloor = nextFloor;
+    lift.moveTimer = 0.55;
+  } else if (targetFloor < lift.currentFloor) {
+    if (lift.status !== 'PRIORITY_PREEMPTION') lift.status = 'MOVING_DOWN';
+    const nextFloor = lift.currentFloor - 1;
+    if (
+      nextFloor !== targetFloor &&
+      floorsState[nextFloor].callActive &&
+      isLiftFullForHallCalls(lift) &&
+      !lift.cabinQueue.includes(nextFloor)
+    ) {
+      appendAiLog(
+        `F5 BYPASS IN MOTION: Lift ${lift.id} (WT:${lift.weightPct}%, CV:${lift.spacePct}%) bypassed Floor ${nextFloor} landing call non-stop.`,
+        'SAVINGS'
+      );
+      simConfig.smartOpsCount += 1;
+    }
+    lift.currentFloor = nextFloor;
+    lift.moveTimer = 0.55;
+  }
+}
+
+function handleLiftArrivalAtFloor(lift, floorNum) {
+  const flr = floorsState[floorNum];
+  const wasAlreadyOpen = lift.status === 'DOORS_OPEN' || lift.status === 'PALM_HOLD';
+
+  lift.cabinQueue = lift.cabinQueue.filter(f => f !== floorNum);
+  lift.hallQueue = lift.hallQueue.filter(f => f !== floorNum);
+
+  // Feature 7: Unload passengers whose destination was `floorNum`
+  const exitingPax = lift.destHeadcounts[floorNum] || 0;
+  if (exitingPax > 0) {
+    const freedWt = exitingPax * 12;
+    const freedSp = exitingPax * 18;
+    lift.weightPct = Math.max(0, lift.weightPct - freedWt);
+    lift.spacePct = Math.max(0, lift.spacePct - freedSp);
+    lift.destHeadcounts[floorNum] = 0;
+    appendAiLog(
+      `F7 HEADCOUNT UNLOAD: ${exitingPax} passenger(s) exited Lift ${lift.id} at Floor ${floorNum} → Freed ${freedSp}% CV space (Remaining CV: ${lift.spacePct}%)`,
+      'SAVINGS'
+    );
+  }
+
+  // Feature 2: Clear stretcher if arrived at stretcher floor
+  if (flr.hasStretcher || lift.priorityTarget === floorNum) {
+    flr.hasStretcher = false;
+    flr.callActive = false;
+    flr.waitingCount = 0;
+    lift.priorityTarget = null;
+    appendAiLog(
+      `F2 MEDICAL EVACUATION: Lift ${lift.id} arrived at Floor ${floorNum} with Priority Override. Stretcher boarded safely.`,
+      'PRIORITY'
+    );
+  }
+
+  // Board waiting hallway passengers if lift has capacity
+  if (flr.callActive && !isLiftFullForHallCalls(lift)) {
+    const boarding = flr.waitingCount;
+    flr.callActive = false;
+    flr.waitingCount = 0;
+    flr.phantomTimer = null;
+    if (boarding > 0) {
+      lift.weightPct = Math.min(100, lift.weightPct + boarding * 10);
+      lift.spacePct = Math.min(100, lift.spacePct + boarding * 14);
+    }
+  }
+
+  // Clear staging target if reached
+  if (lift.stagingTarget === floorNum) {
+    appendAiLog(
+      `F4 PREDICTIVE STAGING: Lift ${lift.id} pre-positioned at Floor ${floorNum} ahead of peak demand.`,
+      'INFO'
+    );
+    lift.stagingTarget = null;
+  }
+
+  lift.status = 'DOORS_OPEN';
+  lift.doorOpenPct = 100;
+  lift.doorTimer = 1.5;
+  if (!wasAlreadyOpen) {
+    playSoundEffect('DING');
+  }
+}
+
+/*************************************************************************
+ * 5. INTERACTIVE UI HANDLERS (FLOOR CONTROLS, KEYPAD, SLIDERS, SCENARIOS)
+ *************************************************************************/
+function pressHallCall(floorNum) {
+  const flr = floorsState[floorNum];
+  flr.callActive = true;
+  if (flr.waitingCount === 0 && !flr.hasStretcher) {
+    flr.waitingCount = 1;
+  }
+  flr.phantomTimer = null;
+
+  const res = assignHallCallToOptimalLift(liftsState, floorNum);
+  appendAiLog(res.reason, 'INFO');
+  renderAllUI();
+}
+
+function adjustWaitingPassengers(floorNum, delta) {
+  const flr = floorsState[floorNum];
+  flr.waitingCount = Math.max(0, Math.min(12, flr.waitingCount + delta));
+  if (flr.waitingCount > 0) {
+    flr.phantomTimer = null;
+    if (flr.callActive && !liftsState.A.hallQueue.includes(floorNum) && !liftsState.B.hallQueue.includes(floorNum)) {
+      assignHallCallToOptimalLift(liftsState, floorNum);
+    }
+  } else if (flr.callActive && !flr.hasStretcher) {
+    flr.phantomTimer = 3.0;
+  }
+  renderAllUI();
+}
+
+function triggerPassengerWalkAway(floorNum) {
+  const flr = floorsState[floorNum];
+  flr.callActive = true;
+  flr.waitingCount = 0;
+  flr.phantomTimer = 3.0;
+  if (!liftsState.A.hallQueue.includes(floorNum) && !liftsState.B.hallQueue.includes(floorNum)) {
+    assignHallCallToOptimalLift(liftsState, floorNum);
+  }
+  setBanner(
+    'ONLINE',
+    `F3 PHANTOM CHECK: Floor ${floorNum} call active with 0 riders → Holding lift & cancelling in 3.0s unless someone returns.`
+  );
+  appendAiLog(
+    `F3 HALLWAY CV ALERT: Floor ${floorNum} call button active, but passenger walked away (0 pax detected) → Holding dispatch & starting 3.0s cancellation countdown...`,
+    'SAVINGS'
+  );
+  renderAllUI();
+}
+
+function toggleFloorStretcher(floorNum) {
+  const flr = floorsState[floorNum];
+  flr.hasStretcher = !flr.hasStretcher;
+  if (flr.hasStretcher) {
+    flr.callActive = true;
+    flr.waitingCount = Math.max(2, flr.waitingCount);
+    flr.phantomTimer = null;
+    const assignedId = applyStretcherPreemption(liftsState, floorNum);
+    playSoundEffect('PRIORITY');
+    appendAiLog(
+      `F2 CV STRETCHER DETECTED on Floor ${floorNum} (Confidence 99.2%) → Lift ${assignedId} preempting all routine calls!`,
+      'PRIORITY'
+    );
+  } else {
+    ['A', 'B'].forEach(id => {
+      if (liftsState[id].priorityTarget === floorNum) {
+        liftsState[id].priorityTarget = null;
+        liftsState[id].status = 'IDLE';
+      }
+    });
+  }
+  renderAllUI();
+}
+
+function handleScheduleChange(profileValue) {
+  simConfig.scheduleProfile = profileValue;
+  const targets = getPredictiveStagingTargets(profileValue);
+  if (targets.A !== null) {
+    liftsState.A.stagingTarget = targets.A;
+    liftsState.B.stagingTarget = targets.B;
+    appendAiLog(`F4 SCHEDULE PROFILE ACTIVE: ${targets.label}`, 'INFO');
+  } else {
+    liftsState.A.stagingTarget = null;
+    liftsState.B.stagingTarget = null;
+    appendAiLog(`F4 Schedule set to Balanced Mode.`, 'INFO');
+  }
+  renderAllUI();
+}
+
+function manualSensorUpdate(liftId) {
+  const wtSlider = document.getElementById(`lift${liftId}WeightSlider`);
+  const spSlider = document.getElementById(`lift${liftId}SpaceSlider`);
+  if (!wtSlider || !spSlider) return;
+
+  liftsState[liftId].weightPct = parseInt(wtSlider.value, 10);
+  liftsState[liftId].spacePct = parseInt(spSlider.value, 10);
+  renderAllUI();
+}
+
+function selectActiveCabin(liftId) {
+  simConfig.activeCabinTab = liftId;
+  renderAllUI();
+}
+
+function handleCabinKeypadTap(floorNum) {
+  const lift = liftsState[simConfig.activeCabinTab];
+  const res = registerDestinationTap(lift, floorNum);
+  // Give a 0.9s multi-tap buffer so repeated taps on any floor button stay lit and increment ×N cleanly
+  lift.keypadBufferTimer = 0.9;
+  appendAiLog(
+    `F7 MULTI-TAP KEYPAD [Cabin ${lift.id}]: Floor ${floorNum} tapped (${res.headcount}x) → ${res.headcount} pax logged. Forecast: ${res.freedSpacePct}% CV space frees at Flr ${floorNum}.`,
+    'INFO'
+  );
+  renderAllUI();
+}
+
+function clearSelectedCabin() {
+  const lift = liftsState[simConfig.activeCabinTab];
+  lift.weightPct = 0;
+  lift.spacePct = 0;
+  lift.cabinQueue = [];
+  lift.destHeadcounts = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0 };
+  lift.distressActive = false;
+  lift.keypadBufferTimer = 0;
+  if (lift.status === 'EMERGENCY_STOP') lift.status = 'IDLE';
+  appendAiLog(`Cabin ${lift.id} reset to 0% load and all multi-tap destinations cleared.`, 'INFO');
+  renderAllUI();
+}
+
+function toggleCabinDistress() {
+  const lift = liftsState[simConfig.activeCabinTab];
+  if (!lift.distressActive) {
+    triggerLiftDistressState(lift);
+    setBanner(
+      'EMERGENCY',
+      `F6 IN-CABIN DISTRESS ALERT: Passenger collapse detected in Lift ${lift.id} at Floor ${lift.currentFloor}! Siren active & doors locked open.`
+    );
+    appendAiLog(
+      `F6 CRITICAL SAFETY ALERT: Overhead CV detected collapsed passenger in Lift ${lift.id} (Floor ${lift.currentFloor}) → Emergency Siren ON, Lift Halted, Security Notified!`,
+      'EMERGENCY'
+    );
+  } else {
+    lift.distressActive = false;
+    lift.status = 'IDLE';
+    lift.doorOpenPct = 0;
+    setBanner('ONLINE', `Emergency resolved in Lift ${lift.id}. Normal AI dispatch resumed.`);
+    appendAiLog(`F6 Emergency resolved in Lift ${lift.id}. Resuming normal operation.`, 'INFO');
+  }
+  updateSirenLoop();
+  renderAllUI();
+}
+
+function triggerPalmGestureHold() {
+  let targetLift = null;
+  if (liftsState.A.status === 'DOORS_CLOSING' || liftsState.A.status === 'DOORS_OPEN') {
+    targetLift = liftsState.A;
+  } else if (liftsState.B.status === 'DOORS_CLOSING' || liftsState.B.status === 'DOORS_OPEN') {
+    targetLift = liftsState.B;
+  } else {
+    targetLift = liftsState.A;
+  }
+
+  const res = applyPalmGestureDoorHold(targetLift);
+  playSoundEffect('PALM_HOLD');
+  simConfig.smartOpsCount += 1;
+  setBanner(
+    'GESTURE',
+    `F8 PALM GESTURE DETECTED: Open palm recognized at Floor ${res.floor} → Lift ${res.liftId} doors reversed to OPEN & held for 5.0s!`
+  );
+  appendAiLog(
+    `F8 HALLWAY PALM GESTURE: Rushing passenger showed open palm at Floor ${res.floor} → Lift ${res.liftId} interrupted door close & holding 5.0s.`,
+    'GESTURE'
+  );
+  renderAllUI();
+}
+
+function resetFullSimulation() {
+  floorsState = createInitialFloors();
+  liftsState = {
+    A: createLiftState('A', 1),
+    B: createLiftState('B', 1)
+  };
+  simConfig.scheduleProfile = 'NORMAL';
+  const sel = document.getElementById('scheduleSelect');
+  if (sel) sel.value = 'NORMAL';
+  setBanner('ONLINE', 'Digital twin reset to baseline. All 8 AI Retrofit modules nominal.');
+  appendAiLog('Digital Twin reset to clean baseline state.', 'INFO');
+  updateSirenLoop();
+  renderAllUI();
+}
+
+/*************************************************************************
+ * 6. 8 ONE-CLICK JUDGE DEMO SCENARIO PRESETS
+ *************************************************************************/
+function triggerJudgeScenario(featureNum) {
+  floorsState = createInitialFloors();
+  liftsState = {
+    A: createLiftState('A', 1),
+    B: createLiftState('B', 1)
+  };
+
+  switch (featureNum) {
+    case 1: {
+      // Feature 1: Dynamic Multi-Car Load Balancing
+      liftsState.A.currentFloor = 2;
+      liftsState.A.weightPct = 88;
+      liftsState.A.spacePct = 95;
+      liftsState.B.currentFloor = 1;
+      liftsState.B.weightPct = 0;
+      liftsState.B.spacePct = 0;
+
+      floorsState[4].callActive = true;
+      floorsState[4].waitingCount = 2;
+      const res = assignHallCallToOptimalLift(liftsState, 4);
+      setBanner(
+        'ONLINE',
+        `DEMO F1 (Load Balancing): Lift A is Full (95% Space) at Floor 2. Floor 4 call automatically delegated to idle Lift B!`
+      );
+      appendAiLog(`JUDGE DEMO F1: ${res.reason}`, 'INFO');
+      break;
+    }
+
+    case 2: {
+      // Feature 2: Stretcher Priority Preemption
+      liftsState.A.currentFloor = 1;
+      liftsState.A.hallQueue = [2, 3];
+      floorsState[2].callActive = true;
+      floorsState[2].waitingCount = 1;
+      floorsState[3].callActive = true;
+      floorsState[3].waitingCount = 1;
+
+      floorsState[5].hasStretcher = true;
+      floorsState[5].callActive = true;
+      floorsState[5].waitingCount = 2;
+      applyStretcherPreemption(liftsState, 5);
+      playSoundEffect('PRIORITY');
+      setBanner(
+        'PRIORITY',
+        `DEMO F2 (Stretcher Preemption): Stretcher detected on Floor 5! Lift A overrides Floor 2 & 3 stops to go straight to Floor 5.`
+      );
+      appendAiLog(
+        `JUDGE DEMO F2: Stretcher detected on Floor 5 → Lift A entered PRIORITY_PREEMPTION and delegated routine calls to Lift B.`,
+        'PRIORITY'
+      );
+      break;
+    }
+
+    case 3: {
+      // Feature 3: Phantom Call Cancellation
+      liftsState.A.currentFloor = 1;
+      floorsState[4].callActive = true;
+      floorsState[4].waitingCount = 0;
+      floorsState[4].phantomTimer = 3.0;
+      liftsState.A.hallQueue = [4];
+      setBanner(
+        'ONLINE',
+        `DEMO F3 (Phantom Call): Floor 4 button pressed, but passenger walked away (0 pax). Watch the 3.0s countdown cancel the call!`
+      );
+      appendAiLog(
+        `JUDGE DEMO F3: Floor 4 landing empty (0 pax) → 3.0s phantom call verification timer started.`,
+        'SAVINGS'
+      );
+      break;
+    }
+
+    case 4: {
+      // Feature 4: Predictive Floor Staging
+      liftsState.A.currentFloor = 1;
+      liftsState.B.currentFloor = 2;
+      simConfig.scheduleProfile = 'EVENING_EXIT';
+      const sel = document.getElementById('scheduleSelect');
+      if (sel) sel.value = 'EVENING_EXIT';
+      handleScheduleChange('EVENING_EXIT');
+      setBanner(
+        'ONLINE',
+        `DEMO F4 (Predictive Staging): Switched clock to 04:30 PM Campus/Office Exit Rush → Pre-staging Lift A to Flr 6 & Lift B to Flr 5.`
+      );
+      break;
+    }
+
+    case 5: {
+      // Feature 5: Dual-Modal Full-Capacity Bypass
+      liftsState.A.currentFloor = 1;
+      liftsState.A.weightPct = 55;
+      liftsState.A.spacePct = 94;
+      liftsState.A.cabinQueue = [6];
+
+      floorsState[3].callActive = true;
+      floorsState[3].waitingCount = 2;
+      setBanner(
+        'ONLINE',
+        `DEMO F5 (Dual-Modal Bypass): Lift A Weight is only 55%, but CV Floor Space is 94% full. Watch Lift A skip Floor 3 and go non-stop to Floor 6!`
+      );
+      appendAiLog(
+        `JUDGE DEMO F5: Lift A Weight=55% (OK) but Cabin CV Space=94% (FULL) → Capacity Bypass active! Skipping Floor 3 hall call.`,
+        'SAVINGS'
+      );
+      break;
+    }
+
+    case 6: {
+      // Feature 6: In-Cabin Distress & Siren Alert (Auto-switch to Cabin tab)
+      simConfig.activeCabinTab = 'A';
+      liftsState.A.currentFloor = 3;
+      triggerLiftDistressState(liftsState.A);
+      showTab('cabin');
+      setBanner(
+        'EMERGENCY',
+        `DEMO F6 (Cabin Distress Siren): Passenger collapse detected inside Lift A at Floor 3! Emergency siren & security dispatch triggered.`
+      );
+      appendAiLog(
+        `JUDGE DEMO F6: Passenger unconscious/collapsed in Lift A at Floor 3 → EMERGENCY_STOP & audible siren activated!`,
+        'EMERGENCY'
+      );
+      break;
+    }
+
+    case 7: {
+      // Feature 7: Multi-Tap Destination Headcount Tracking (Auto-switch to Cabin tab)
+      simConfig.activeCabinTab = 'A';
+      liftsState.A.currentFloor = 1;
+      for (let i = 0; i < 5; i++) {
+        registerDestinationTap(liftsState.A, 6);
+      }
+      showTab('cabin');
+      setBanner(
+        'ONLINE',
+        `DEMO F7 (Multi-Tap Headcount): Floor 6 button tapped 5 times (×5 badge) → AI knows 5 pax (90% space) will unload at Floor 6!`
+      );
+      appendAiLog(
+        `JUDGE DEMO F7: 5x taps registered on Floor 6 in Lift A → Forecast: 90% cabin space will free up upon Floor 6 arrival.`,
+        'INFO'
+      );
+      break;
+    }
+
+    case 8: {
+      // Feature 8: Hallway Palm-Gesture Door Hold
+      liftsState.A.currentFloor = 2;
+      liftsState.A.status = 'DOORS_CLOSING';
+      liftsState.A.doorOpenPct = 35;
+      liftsState.A.doorTimer = 0.8;
+      setTimeout(() => {
+        triggerPalmGestureHold();
+      }, 300);
+      break;
+    }
+  }
+
+  updateSirenLoop();
+  renderAllUI();
+}
+
+/*************************************************************************
+ * 7. DOM RENDERING ENGINE (APPLE-INSPIRED UI LAYER — ZERO BUTTON RE-RENDERS)
+ *************************************************************************/
+function renderAllUI() {
+  renderFloorLandingRows();
+  renderElevatorCars();
+  renderCabinKeypadAndForecast();
+  renderRoiMetrics();
+}
+
+function renderFloorLandingRows() {
+  for (let f = 6; f >= 1; f--) {
+    const x = floorsState[f];
+    const rowEl = document.getElementById(`floorRow-${f}`);
+    const chipsEl = document.getElementById(`floorChips-${f}`);
+    const stretchBtn = document.getElementById(`btnStretch-${f}`);
+    const callBtn = document.getElementById(`btnCall-${f}`);
+
+    if (rowEl) {
+      const nextRowClass = `floor${x.callActive ? ' called' : ''}${x.hasStretcher ? ' stretch' : ''}`;
+      if (rowEl.className !== nextRowClass) rowEl.className = nextRowClass;
+    }
+
+    if (chipsEl) {
+      const nextChipsHtml =
+        (x.waitingCount > 0 ? `<span class="chip sm"><i class="fa-solid fa-user" style="margin-right:4px"></i>${x.waitingCount}</span>` : '') +
+        (x.phantomTimer !== null ? `<span class="chip sm warn">Cancelling ${x.phantomTimer.toFixed(1)}s</span>` : '') +
+        (x.hasStretcher ? `<span class="chip sm info">Stretcher</span>` : '');
+      if (chipsEl.dataset.cache !== nextChipsHtml) {
+        chipsEl.dataset.cache = nextChipsHtml;
+        chipsEl.innerHTML = nextChipsHtml;
+      }
+    }
+
+    if (stretchBtn) {
+      const nextStretchClass = `tb${x.hasStretcher ? ' on' : ''}`;
+      if (stretchBtn.className !== nextStretchClass) stretchBtn.className = nextStretchClass;
+    }
+
+    if (callBtn) {
+      const nextCallClass = `call${x.callActive ? ' on' : ''}`;
+      if (callBtn.className !== nextCallClass) callBtn.className = nextCallClass;
+      const nextCallText = x.callActive ? 'Called' : 'Call';
+      if (callBtn.textContent !== nextCallText) callBtn.textContent = nextCallText;
+    }
+  }
+}
+
+function renderElevatorCars() {
+  ['A', 'B'].forEach(id => {
+    const l = liftsState[id];
+    const $ = s => document.getElementById(`lift${id}${s}`);
+    // Fixed selector matching buildStatic() id="liftCarA" and id="liftCarB"
+    const car = document.getElementById('liftCar' + id);
+    if (car) {
+      car.style.bottom = ((l.currentFloor - 1) * 76 + 4) + 'px';
+      car.classList.toggle('sos', l.distressActive);
+      car.classList.toggle('pri', !l.distressActive && (l.status === 'PRIORITY_PREEMPTION' || l.status === 'PALM_HOLD'));
+    }
+
+    const w = Math.max(4, Math.round(48 * (1 - l.doorOpenPct / 100)));
+    const doorLeft = $('DoorLeft');
+    const doorRight = $('DoorRight');
+    if (doorLeft && doorRight) {
+      doorLeft.style.width = doorRight.style.width = w + '%';
+    }
+
+    let lab = l.status.replace(/_/g, ' ').toLowerCase();
+    let cls = '';
+    lab = lab[0].toUpperCase() + lab.slice(1);
+    if (l.distressActive) { lab = 'SOS'; cls = 'bad'; }
+    else if (l.status === 'PRIORITY_PREEMPTION') { lab = 'Priority'; cls = 'info'; }
+    else if (l.status === 'PALM_HOLD') { lab = `Hold ${l.doorTimer.toFixed(0)}s`; cls = 'info'; }
+    else if (isLiftInCvSpaceBypass(l)) { lab = 'Cabin full'; cls = 'warn'; }
+    else if (isLiftFullForHallCalls(l)) { lab = 'Full'; cls = 'bad'; }
+    else if (l.status === 'IDLE') { cls = 'ok'; }
+
+    const b = $('StateBadge');
+    if (b) {
+      b.className = 'chip sm ' + cls;
+      b.textContent = lab;
+    }
+
+    const n = Math.max(0, Math.round(l.spacePct / 16));
+    const interior = $('Interior');
+    if (interior) {
+      interior.innerHTML = l.distressActive
+        ? '<span style="color:var(--bad)">Collapse</span>'
+        : l.status === 'PRIORITY_PREEMPTION'
+        ? '<span style="color:var(--info)">Stretcher</span>'
+        : n === 0
+        ? 'Empty'
+        : `${n} ${n === 1 ? 'rider' : 'riders'}`;
+    }
+
+    const wb = $('WtBar');
+    const sb = $('SpBar');
+    if (wb) {
+      wb.style.width = l.weightPct + '%';
+      wb.style.background = l.weightPct >= 85 ? 'var(--bad)' : 'var(--acc)';
+    }
+    if (sb) {
+      sb.style.width = l.spacePct + '%';
+      sb.style.background = l.spacePct >= 90 ? 'var(--bad)' : 'var(--acc)';
+    }
+
+    const ws = $('WeightSlider');
+    const ss = $('SpaceSlider');
+    if (ws && document.activeElement !== ws) ws.value = l.weightPct;
+    if (ss && document.activeElement !== ss) ss.value = l.spacePct;
+
+    const wl = $('WeightLabel');
+    const sl = $('SpaceLabel');
+    if (wl) {
+      wl.textContent = l.weightPct + '%';
+      wl.className = l.weightPct >= 85 ? 'bad' : '';
+    }
+    if (sl) {
+      sl.textContent = l.spacePct + '%';
+      sl.className = l.spacePct >= 90 ? 'bad' : '';
+    }
+
+    const t = $('BypassTag');
+    if (t) {
+      if (isLiftInCvSpaceBypass(l)) {
+        t.className = 'chip sm warn';
+        t.textContent = 'Cabin space full';
+      } else if (isLiftFullForHallCalls(l)) {
+        t.className = 'chip sm bad';
+        t.textContent = 'Full · skipping halls';
+      } else {
+        t.className = 'chip sm ok';
+        t.textContent = 'Accepting calls';
+      }
+    }
+
+    const stops = [...new Set([...l.cabinQueue, ...l.hallQueue])];
+    const qt = $('QueueText');
+    const ft = $('FloorText');
+    if (qt) qt.textContent = stops.length ? 'Floors ' + stops.join(', ') : l.stagingTarget ? 'Staging ' + l.stagingTarget : 'Idle';
+    if (ft) ft.textContent = l.currentFloor;
+  });
+}
+
+function renderCabinKeypadAndForecast() {
+  const id = simConfig.activeCabinTab;
+  const l = liftsState[id];
+  document.getElementById('tabCabinA').classList.toggle('on', id === 'A');
+  document.getElementById('tabCabinB').classList.toggle('on', id === 'B');
+
+  for (let f = 6; f >= 1; f--) {
+    const t = l.destHeadcounts[f] || 0;
+    const isQueued = l.cabinQueue.includes(f) || t > 0;
+    const keyBtn = document.getElementById(`cabinKey-${f}`);
+    const badgeEl = document.getElementById(`cabinKeyBadge-${f}`);
+
+    if (keyBtn) {
+      const nextKeyClass = `key${isQueued ? ' q' : ''}`;
+      if (keyBtn.className !== nextKeyClass) keyBtn.className = nextKeyClass;
+    }
+    if (badgeEl) {
+      const nextBadgeText = t > 0 ? `×${t}` : '';
+      if (badgeEl.textContent !== nextBadgeText) badgeEl.textContent = nextBadgeText;
+    }
+  }
+
+  const act = Object.keys(l.destHeadcounts).filter(f => l.destHeadcounts[f] > 0);
+  const forecastEl = document.getElementById('headcountForecastText');
+  if (forecastEl) {
+    const nextForecastHtml = act.length
+      ? act.map(f => `<b>${l.destHeadcounts[f]} ${l.destHeadcounts[f] === 1 ? 'rider' : 'riders'} → floor ${f}</b> · frees ${Math.min(100, l.destHeadcounts[f] * 18)}% space`).join('<br>')
+      : `Tap a floor repeatedly to log how many riders are heading there.`;
+    if (forecastEl.dataset.cache !== nextForecastHtml) {
+      forecastEl.dataset.cache = nextForecastHtml;
+      forecastEl.innerHTML = nextForecastHtml;
+    }
+  }
+
+  const btn = document.getElementById('distressToggleBtn');
+  const nextBtnClass = 'btn danger' + (l.distressActive ? ' solid' : '');
+  if (btn && btn.className !== nextBtnClass) btn.className = nextBtnClass;
+
+  const lbl = document.getElementById('distressBtnLabel');
+  const nextLblText = l.distressActive ? `Resolve Cabin ${id} emergency` : `Simulate emergency in ${id}`;
+  if (lbl && lbl.textContent !== nextLblText) lbl.textContent = nextLblText;
+}
+
+function renderRoiMetrics() {
+  const s = (i, v) => {
+    const e = document.getElementById(i);
+    if (e) e.textContent = v;
+  };
+  s('roiPhantomCount', simConfig.phantomSavedCount);
+  s('roiSmartOpsCount', simConfig.smartOpsCount);
+  s('roiEnergyKwh', simConfig.energySavedKwh + ' kWh');
+  s('roiAnnualInr', '₹' + simConfig.annualSavingsInr.toLocaleString('en-IN'));
+}
+
+/*************************************************************************
+ * 8. EDGE AI COMPUTER VISION HUD CANVAS & OPTIONAL WEBRTC WEBCAM
+ *************************************************************************/
+let webcamStream = null;
+let prevFrameData = null;
+
+async function toggleRealWebcam() {
+  const v = document.getElementById('realWebcamVideo');
+  const b = document.getElementById('webcamToggleBtn');
+  const h = document.getElementById('webcamHintOverlay');
+  if (!simConfig.realWebcamActive) {
+    try {
+      webcamStream = await navigator.mediaDevices.getUserMedia({ video: { width: 320, height: 180 } });
+      v.srcObject = webcamStream;
+      v.classList.remove('hidden');
+      h.classList.remove('hidden');
+      simConfig.realWebcamActive = true;
+      b.textContent = 'Stop camera';
+      appendAiLog('Camera connected. Wave a palm to hold the doors.', 'GESTURE');
+    } catch (e) {
+      appendAiLog('Camera unavailable — continuing with the simulated feed.');
+    }
+  } else {
+    if (webcamStream) {
+      webcamStream.getTracks().forEach(t => t.stop());
+      webcamStream = null;
+    }
+    v.classList.add('hidden');
+    h.classList.add('hidden');
+    simConfig.realWebcamActive = false;
+    b.textContent = 'Use camera';
+  }
+}
+
+function drawCvHudCanvas() {
+  const canvas = document.getElementById('cvHudCanvas');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  const w = (canvas.width = canvas.clientWidth || 340);
+  const h = (canvas.height = canvas.clientHeight || 200);
+
+  ctx.clearRect(0, 0, w, h);
+
+  // Subtle tactical grid overlay
+  ctx.strokeStyle = 'rgba(255, 159, 10, 0.08)';
+  ctx.lineWidth = 1;
+  for (let x = 0; x < w; x += 24) {
+    ctx.beginPath();
+    ctx.moveTo(x, 0);
+    ctx.lineTo(x, h);
+    ctx.stroke();
+  }
+  for (let y = 0; y < h; y += 24) {
+    ctx.beginPath();
+    ctx.moveTo(0, y);
+    ctx.lineTo(w, y);
+    ctx.stroke();
+  }
+
+  // Split screen: Left half = Hallway Camera, Right half = Cabin Camera
+  ctx.strokeStyle = '#3a3a3c';
+  ctx.beginPath();
+  ctx.moveTo(w / 2, 0);
+  ctx.lineTo(w / 2, h);
+  ctx.stroke();
+
+  ctx.font = '10px ui-monospace, SFMono-Regular, Menlo, monospace';
+  ctx.fillStyle = '#98989d';
+  ctx.fillText('CAM-01: HALLWAY LANDING', 10, 42);
+  ctx.fillText(`CAM-02: CABIN ${simConfig.activeCabinTab} OVERHEAD`, w / 2 + 10, 42);
+
+  const stretcherFloor = Object.values(floorsState).find(f => f.hasStretcher);
+  const phantomFloor = Object.values(floorsState).find(f => f.phantomTimer !== null);
+  const palmLift = [liftsState.A, liftsState.B].find(l => l.status === 'PALM_HOLD');
+  const activeLift = liftsState[simConfig.activeCabinTab];
+
+  const hallStatusEl = document.getElementById('cvHallwayStatus');
+  const cabinStatusEl = document.getElementById('cvCabinStatus');
+
+  // LEFT HALF: Hallway Bounding Boxes
+  if (stretcherFloor) {
+    ctx.strokeStyle = '#64d2ff';
+    ctx.lineWidth = 2;
+    ctx.strokeRect(14, 56, w / 2 - 28, 90);
+    ctx.fillStyle = 'rgba(100, 210, 255, 0.18)';
+    ctx.fillRect(14, 56, w / 2 - 28, 90);
+    ctx.fillStyle = '#64d2ff';
+    ctx.fillText(`STRETCHER [F${stretcherFloor.floor}] 99%`, 20, 74);
+    ctx.fillText(`PRIORITY OVERRIDE`, 20, 132);
+    if (hallStatusEl) {
+      hallStatusEl.textContent = `Stretcher · Floor ${stretcherFloor.floor}`;
+      hallStatusEl.style.color = 'var(--info)';
+    }
+  } else if (palmLift) {
+    ctx.strokeStyle = '#64d2ff';
+    ctx.lineWidth = 2;
+    ctx.strokeRect(20, 56, w / 2 - 40, 92);
+    ctx.fillStyle = 'rgba(100, 210, 255, 0.2)';
+    ctx.fillRect(20, 56, w / 2 - 40, 92);
+    ctx.fillStyle = '#64d2ff';
+    ctx.fillText(`OPEN PALM [F${palmLift.currentFloor}] 98%`, 26, 74);
+    ctx.fillText(`HOLDING DOORS: ${palmLift.doorTimer.toFixed(1)}s`, 26, 134);
+    if (hallStatusEl) {
+      hallStatusEl.textContent = `Palm hold (${palmLift.doorTimer.toFixed(1)}s)`;
+      hallStatusEl.style.color = 'var(--info)';
+    }
+  } else if (phantomFloor) {
+    ctx.strokeStyle = '#ff9f0a';
+    ctx.setLineDash([4, 4]);
+    ctx.strokeRect(18, 56, w / 2 - 36, 88);
+    ctx.setLineDash([]);
+    ctx.fillStyle = '#ff9f0a';
+    ctx.fillText(`FLR ${phantomFloor.floor}: 0 PAX`, 24, 78);
+    ctx.fillText(`CANCEL IN ${phantomFloor.phantomTimer.toFixed(1)}s`, 24, 122);
+    if (hallStatusEl) {
+      hallStatusEl.textContent = `Phantom check · Floor ${phantomFloor.floor}`;
+      hallStatusEl.style.color = 'var(--warn)';
+    }
+  } else {
+    const totalWaiting = Object.values(floorsState).reduce((acc, f) => acc + f.waitingCount, 0);
+    ctx.strokeStyle = '#30d158';
+    ctx.lineWidth = 1.5;
+    const boxes = Math.min(3, Math.max(1, totalWaiting));
+    for (let i = 0; i < boxes; i++) {
+      const bx = 16 + i * 38;
+      ctx.strokeRect(bx, 62, 30, 74);
+      ctx.fillStyle = '#30d158';
+      ctx.fillText(`PAX`, bx + 4, 78);
+    }
+    if (hallStatusEl) {
+      hallStatusEl.textContent = `${totalWaiting} waiting`;
+      hallStatusEl.style.color = 'var(--ok)';
+    }
+  }
+
+  // RIGHT HALF: Cabin Overhead Spatial Occupancy & Distress Detection
+  const rx = w / 2 + 14;
+  if (activeLift.distressActive) {
+    ctx.strokeStyle = '#ff453a';
+    ctx.lineWidth = 2;
+    ctx.strokeRect(rx, 56, w / 2 - 28, 92);
+    ctx.fillStyle = 'rgba(255, 69, 58, 0.25)';
+    ctx.fillRect(rx, 56, w / 2 - 28, 92);
+    ctx.fillStyle = '#ff8a80';
+    ctx.fillText('FALL / COLLAPSE 99%', rx + 8, 76);
+    ctx.fillText('SIREN + SOS ACTIVE', rx + 8, 132);
+    if (cabinStatusEl) {
+      cabinStatusEl.textContent = `SOS · Cabin ${activeLift.id}`;
+      cabinStatusEl.style.color = 'var(--bad)';
+    }
+  } else {
+    ctx.strokeStyle = activeLift.spacePct >= 90 ? '#ff453a' : '#ff9f0a';
+    ctx.lineWidth = 1.5;
+    ctx.strokeRect(rx, 56, w / 2 - 28, 92);
+
+    const fillH = Math.round(((activeLift.spacePct || 0) / 100) * 88);
+    ctx.fillStyle = activeLift.spacePct >= 90 ? 'rgba(255, 69, 58, 0.3)' : 'rgba(255, 159, 10, 0.22)';
+    ctx.fillRect(rx + 2, 56 + (90 - fillH), w / 2 - 32, fillH);
+
+    ctx.fillStyle = '#f5f5f7';
+    ctx.fillText(`CV SPACE: ${activeLift.spacePct}%`, rx + 8, 76);
+    ctx.fillText(`WEIGHT:   ${activeLift.weightPct}%`, rx + 8, 96);
+    ctx.fillStyle = activeLift.spacePct >= 90 ? '#ff8a80' : '#30d158';
+    ctx.fillText(activeLift.spacePct >= 90 ? 'BYPASS HALL CALLS' : 'SPACE NOMINAL', rx + 8, 134);
+
+    if (cabinStatusEl) {
+      cabinStatusEl.textContent = activeLift.spacePct >= 90
+        ? `Cabin ${activeLift.id} full (${activeLift.spacePct}%)`
+        : `Cabin ${activeLift.id} nominal`;
+      cabinStatusEl.style.color = activeLift.spacePct >= 90 ? 'var(--warn)' : 'var(--ok)';
+    }
+  }
+
+  // If Real Webcam is active, sample motion to auto-trigger Feature 8 Palm Gesture
+  if (simConfig.realWebcamActive) {
+    const video = document.getElementById('realWebcamVideo');
+    if (video && video.readyState >= 2) {
+      const off = document.createElement('canvas');
+      off.width = 48;
+      off.height = 36;
+      const octx = off.getContext('2d');
+      octx.drawImage(video, 0, 0, 48, 36);
+      const frame = octx.getImageData(0, 0, 48, 36).data;
+      if (prevFrameData) {
+        let diff = 0;
+        for (let i = 0; i < frame.length; i += 16) {
+          diff += Math.abs(frame[i] - prevFrameData[i]);
+        }
+        const motionScore = Math.min(100, Math.round(diff / 180));
+        const meter = document.getElementById('motionMeter');
+        if (meter) meter.textContent = `Motion: ${motionScore}%`;
+        if (motionScore > 42 && liftsState.A.status !== 'PALM_HOLD') {
+          triggerPalmGestureHold();
+        }
+      }
+      prevFrameData = frame;
+    }
+  }
+}
+
+/*************************************************************************
+ * 9. HEADER CONTROLS (SPEED & AUDIO TOGGLES)
+ *************************************************************************/
+function toggleSimSpeed() {
+  simConfig.speedMultiplier = simConfig.speedMultiplier === 1 ? 2 : 1;
+  document.getElementById('speedLabel').textContent = simConfig.speedMultiplier + '×';
+}
+
+function toggleAudio() {
+  simConfig.audioEnabled = !simConfig.audioEnabled;
+  document.getElementById('audioIcon').className = 'fa-solid ' + (simConfig.audioEnabled ? 'fa-volume-high' : 'fa-volume-xmark');
+  if (simConfig.audioEnabled) playSoundEffect('DING');
+  else if (sirenInterval) {
+    clearInterval(sirenInterval);
+    sirenInterval = null;
+  }
+}
+
+/*************************************************************************
+ * 10. BUILT-IN AUTOMATED QA TEST SUITE (VERIFIES ALL 8 FEATURES)
+ *************************************************************************/
+function openTestModalAndRun() {
+  const modal = document.getElementById('qaTestModal');
+  if (modal) modal.classList.remove('hidden');
+  runAllAutomatedTests();
+}
+
+function closeTestModal() {
+  const modal = document.getElementById('qaTestModal');
+  if (modal) modal.classList.add('hidden');
+}
+
+function watchScenarioFromModal(featureNum) {
+  closeTestModal();
+  triggerJudgeScenario(featureNum);
+}
+
+function renderQaResults(results, ms) {
+  const n = results.filter(r => r.passed).length;
+  const b = document.getElementById('testSummaryBadge');
+  b.textContent = `${n} of ${results.length} passed`;
+  b.className = 'chip ' + (n === results.length ? 'ok' : 'bad');
+  document.getElementById('testDurationLabel').textContent = '· ' + ms + ' ms';
+  document.getElementById('qaTestResultsContainer').innerHTML = results.map(r => `
+    <div class="t"><span class="ck ${r.passed ? '' : 'f'}"><i class="fa-solid ${r.passed ? 'fa-check' : 'fa-xmark'}"></i></span>
+    <div><b>${r.title.replace(/^Feature \d: /, '')}</b><p>${r.assertion}</p></div>
+    <button class="pill" onclick="watchScenarioFromModal(${r.id})">Watch</button></div>`).join('');
+}
+
+function runAllAutomatedTests() {
+  const startTime = performance.now();
+  const results = [];
+
+  // TEST 1: Dynamic Multi-Car Load Balancing
+  {
+    const mockLifts = { A: createLiftState('A', 2), B: createLiftState('B', 1) };
+    mockLifts.A.weightPct = 90;
+    mockLifts.A.spacePct = 95;
+    mockLifts.B.weightPct = 0;
+    mockLifts.B.spacePct = 0;
+
+    const decision = assignHallCallToOptimalLift(mockLifts, 4);
+    const passed = decision.assignedLift === 'B' && mockLifts.B.hallQueue.includes(4) && !mockLifts.A.hallQueue.includes(4);
+    results.push({
+      id: 1,
+      title: 'Feature 1: Dynamic Multi-Car Load Balancing',
+      passed: passed,
+      assertion: `Given Lift A is Full (WT:90%, CV:95%) and Floor 4 is called → Expected assignedLift === "B" & Lift B queue === [4]. Actual: assignedLift="${decision.assignedLift}", Lift B queue=[${mockLifts.B.hallQueue.join(',')}].`
+    });
+  }
+
+  // TEST 2: Computer Vision Stretcher Priority Preemption
+  {
+    const mockLifts = { A: createLiftState('A', 1), B: createLiftState('B', 6) };
+    mockLifts.A.hallQueue = [2, 3];
+    const preemptedId = applyStretcherPreemption(mockLifts, 5);
+    const passed =
+      preemptedId === 'A' &&
+      mockLifts.A.status === 'PRIORITY_PREEMPTION' &&
+      mockLifts.A.priorityTarget === 5 &&
+      mockLifts.A.hallQueue.length === 1 &&
+      mockLifts.A.hallQueue[0] === 5 &&
+      mockLifts.B.hallQueue.includes(2);
+    results.push({
+      id: 2,
+      title: 'Feature 2: Computer Vision Priority Preemption (Stretcher)',
+      passed: passed,
+      assertion: `Given Lift A has queue [2, 3] and Stretcher appears at Floor 5 → Expected Lift A status="PRIORITY_PREEMPTION", priorityTarget=5, and routine stops [2,3] delegated to Lift B. Actual: status="${mockLifts.A.status}", target=${mockLifts.A.priorityTarget}.`
+    });
+  }
+
+  // TEST 3: Phantom Call Cancellation (Walk-Away Verification)
+  {
+    const mockFloors = createInitialFloors();
+    const mockLifts = { A: createLiftState('A', 1), B: createLiftState('B', 1) };
+    mockFloors[4].callActive = true;
+    mockFloors[4].waitingCount = 0;
+    mockLifts.A.hallQueue = [4];
+
+    stepPhantomCallVerification(mockFloors[4], mockLifts, 1.0);
+    const step2 = stepPhantomCallVerification(mockFloors[4], mockLifts, 3.0);
+    const passed = step2.cancelled === true && mockFloors[4].callActive === false && !mockLifts.A.hallQueue.includes(4);
+    results.push({
+      id: 3,
+      title: 'Feature 3: Phantom Call Cancellation (0-Pax Walk-Away)',
+      passed: passed,
+      assertion: `Given Floor 4 callActive=true with waitingCount=0 for 3.0s → Expected callActive=false and Floor 4 removed from Lift A queue. Actual: cancelled=${step2.cancelled}, callActive=${mockFloors[4].callActive}, Lift A queue=[${mockLifts.A.hallQueue.join(',')}].`
+    });
+  }
+
+  // TEST 4: Predictive Floor Staging (Peak-Hour Traffic Profiles)
+  {
+    const morning = getPredictiveStagingTargets('MORNING_RUSH');
+    const evening = getPredictiveStagingTargets('EVENING_EXIT');
+    const passed = morning.A === 1 && morning.B === 1 && evening.A === 6 && evening.B === 5;
+    results.push({
+      id: 4,
+      title: 'Feature 4: Predictive Peak-Hour Floor Staging',
+      passed: passed,
+      assertion: `Given Morning Rush (08:55 AM) & Evening Exit (04:30 PM) schedules → Expected Morning stage=[1, 1] and Evening stage=[6, 5]. Actual: Morning=[${morning.A}, ${morning.B}], Evening=[${evening.A}, ${evening.B}].`
+    });
+  }
+
+  // TEST 5: Dual-Modal Full-Capacity Hall Call Bypass (Weight + CV Space)
+  {
+    const mockLift = createLiftState('A', 2);
+    mockLift.weightPct = 58;
+    mockLift.spacePct = 94;
+    const bypassTriggered = isLiftFullForHallCalls(mockLift) && isLiftInCvSpaceBypass(mockLift);
+    results.push({
+      id: 5,
+      title: 'Feature 5: Dual-Modal Capacity Bypass (Weight vs. CV Space)',
+      passed: bypassTriggered === true,
+      assertion: `Given Weight=58% (<85% limit) but Cabin CV Space=94% (>=90% limit) → Expected Dual-Modal Hall Call Bypass to activate. Actual: isLiftFullForHallCalls=${isLiftFullForHallCalls(mockLift)}, isLiftInCvSpaceBypass=${isLiftInCvSpaceBypass(mockLift)}.`
+    });
+  }
+
+  // TEST 6: In-Cabin Distress Detection & Emergency Siren Halt
+  {
+    const mockLift = createLiftState('A', 4);
+    const distressRes = triggerLiftDistressState(mockLift);
+    const passed =
+      mockLift.distressActive === true &&
+      mockLift.status === 'EMERGENCY_STOP' &&
+      mockLift.doorOpenPct === 100 &&
+      distressRes.sirenActive === true;
+    results.push({
+      id: 6,
+      title: 'Feature 6: In-Cabin Collapse Detection & Emergency Siren',
+      passed: passed,
+      assertion: `Given passenger collapse detected in Lift A at Floor 4 → Expected status="EMERGENCY_STOP", doorOpenPct=100%, sirenActive=true. Actual: status="${mockLift.status}", doorOpenPct=${mockLift.doorOpenPct}%, sirenActive=${distressRes.sirenActive}.`
+    });
+  }
+
+  // TEST 7: Destination Headcount Tracking (Multi-Tap Keypad)
+  {
+    const mockLift = createLiftState('A', 1);
+    let lastRes = null;
+    for (let i = 0; i < 5; i++) {
+      lastRes = registerDestinationTap(mockLift, 6);
+    }
+    const passed =
+      mockLift.destHeadcounts[6] === 5 &&
+      mockLift.cabinQueue.includes(6) &&
+      lastRes.freedSpacePct === 90 &&
+      lastRes.projectedSpaceAfter === 0;
+    results.push({
+      id: 7,
+      title: 'Feature 7: Multi-Tap Destination Headcount & Clearance Forecast',
+      passed: passed,
+      assertion: `Given 5 taps on Floor 6 button inside Cabin A → Expected destHeadcounts[6]=5 and forecasted space clearance=90% at Floor 6. Actual: headcount=${mockLift.destHeadcounts[6]}, freedSpacePct=${lastRes.freedSpacePct}%.`
+    });
+  }
+
+  // TEST 8: Hallway Palm-Gesture Door Hold
+  {
+    const mockLift = createLiftState('A', 3);
+    mockLift.status = 'DOORS_CLOSING';
+    mockLift.doorOpenPct = 30;
+    mockLift.doorTimer = 0.6;
+
+    const holdRes = applyPalmGestureDoorHold(mockLift);
+    const passed =
+      mockLift.status === 'PALM_HOLD' &&
+      mockLift.doorOpenPct === 100 &&
+      mockLift.doorTimer === 5.0 &&
+      holdRes.holdSeconds === 5.0;
+    results.push({
+      id: 8,
+      title: 'Feature 8: Hallway Palm-Gesture Door Hold Reversal',
+      passed: passed,
+      assertion: `Given Lift A is in DOORS_CLOSING (30% open) and Open Palm Gesture detected → Expected status="PALM_HOLD", doorOpenPct=100%, holdTimer=5.0s. Actual: status="${mockLift.status}", doorOpenPct=${mockLift.doorOpenPct}%, timer=${mockLift.doorTimer}s.`
+    });
+  }
+
+  const elapsedMs = Math.max(1, Math.round(performance.now() - startTime));
+  renderQaResults(results, elapsedMs);
+}
+
+/*************************************************************************
+ * 11. STATIC DOM BUILDER & APPLICATION INITIALIZATION
+ *************************************************************************/
+function buildStatic() {
+  // Build persistent Floor Landing rows once so buttons are never destroyed during 250ms ticks
+  const floorContainer = document.getElementById('floorRowsContainer');
+  if (floorContainer) {
+    let fh = '';
+    for (let f = 6; f >= 1; f--) {
+      fh += `<div class="floor" id="floorRow-${f}">
+        <div class="fn">${f}</div>
+        <div class="fi"><b>${FLOOR_NAMES[f]}</b><div id="floorChips-${f}" data-cache=""></div></div>
+        <div class="fa-row">
+          <button type="button" class="tb" onclick="adjustWaitingPassengers(${f},-1)" title="Remove a waiting passenger"><i class="fa-solid fa-minus"></i></button>
+          <button type="button" class="tb" onclick="adjustWaitingPassengers(${f},1)" title="Add a waiting passenger"><i class="fa-solid fa-plus"></i></button>
+          <button type="button" class="tb" onclick="triggerPassengerWalkAway(${f})" title="Press, then walk away"><i class="fa-solid fa-person-walking-arrow-right"></i></button>
+          <button type="button" class="tb" id="btnStretch-${f}" onclick="toggleFloorStretcher(${f})" title="Stretcher"><i class="fa-solid fa-truck-medical"></i></button>
+          <button type="button" class="call" id="btnCall-${f}" onclick="pressHallCall(${f})">Call</button>
+        </div></div>`;
+    }
+    floorContainer.innerHTML = fh;
+  }
+
+  // Build persistent Cabin Keypad buttons once so multi-tap clicks never drop
+  const keypadGrid = document.getElementById('cabinKeypadGrid');
+  if (keypadGrid) {
+    let kh = '';
+    for (let f = 6; f >= 1; f--) {
+      kh += `<button type="button" class="key" id="cabinKey-${f}" onclick="handleCabinKeypadTap(${f})">${f}<em id="cabinKeyBadge-${f}"></em></button>`;
+    }
+    keypadGrid.innerHTML = kh;
+  }
+
+  ['A', 'B'].forEach(id => {
+    document.getElementById('shaft' + id).innerHTML = `<div class="car" id="liftCar${id}">
+      <div class="doors"><div class="dp" id="lift${id}DoorLeft" style="width:48%"></div><div class="dp" id="lift${id}DoorRight" style="width:48%"></div></div>
+      <div class="cin"><div class="r"><b>${id}</b><span id="lift${id}StateBadge" class="chip sm ok">Idle</span></div>
+      <div id="lift${id}Interior" class="pax">Empty</div>
+      <div class="bars"><div class="bar"><i id="lift${id}WtBar"></i></div><div class="bar"><i id="lift${id}SpBar"></i></div></div></div></div>`;
+  });
+
+  document.getElementById('sensors').innerHTML = ['A', 'B'].map(id => `<div class="sc">
+    <div class="t"><span>Lift ${id}</span><span id="lift${id}BypassTag" class="chip sm ok">Accepting calls</span></div>
+    <div class="sl"><span>Load cell (limit 85%)</span><b id="lift${id}WeightLabel">0%</b></div>
+    <input id="lift${id}WeightSlider" type="range" min="0" max="100" value="0" oninput="manualSensorUpdate('${id}')">
+    <div class="sl"><span>Cabin space (limit 90%)</span><b id="lift${id}SpaceLabel">0%</b></div>
+    <input id="lift${id}SpaceSlider" type="range" min="0" max="100" value="0" oninput="manualSensorUpdate('${id}')">
+    <div class="ft"><span>Queue: <b id="lift${id}QueueText" style="color:var(--ink);font-weight:500">Idle</b></span><span>Floor <b id="lift${id}FloorText" style="color:var(--ink);font-weight:500">1</b></span></div></div>`).join('');
+
+  document.getElementById('demoList').innerHTML = DEMOS.map(d => `<button type="button" class="row" onclick="triggerJudgeScenario(${d[0]})">
+    <span class="ico" style="--c:${d[4]}"><i class="fa-solid ${d[3]}"></i></span><div><b>${d[1]}</b><span>${d[2]}</span></div><i class="fa-solid fa-chevron-right"></i></button>`).join('');
+}
+
+window.onload = function () {
+  buildStatic();
+  showTab('demos');
+  appendAiLog('LiftMind online. Monitoring 6 floors and 2 lifts.');
+  appendAiLog('Choose a demo to see each feature in action.');
+  renderAllUI();
+  drawCvHudCanvas();
+  setInterval(simulationTick, 250);
+  setInterval(drawCvHudCanvas, 120);
+};
+</script>
+</body>
+</html>
