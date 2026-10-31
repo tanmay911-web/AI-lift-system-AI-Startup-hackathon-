@@ -5,6 +5,7 @@
 
 [![Live Demo](https://img.shields.io/badge/🚀_Live_Demo-Open_App-0071e3?style=for-the-badge)](https://app-lime-mu-42.vercel.app/)
 [![Demo Video](https://img.shields.io/badge/🎬_Demo_Video-Watch-ff0000?style=for-the-badge)](#-demo-video)
+[![Pitch Deck](https://img.shields.io/badge/📊_Pitch_Deck-View-f59e0b?style=for-the-badge)](#-pitch-deck)
 [![Source Code](https://img.shields.io/badge/💻_Source_Code-Browse-24292f?style=for-the-badge)](#-source-code)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green?style=for-the-badge)](LICENSE)
 
@@ -20,6 +21,7 @@
 | 💻 **Web app code** (`index.html`) | [`index.html`](index.html) |
 | 🖐️ **Python palm detector code** | [`palm_detector.py`](palm_detector.py) |
 | 🎬 **Demo video** | [Watch below ↓](#-demo-video) |
+| 📊 **Pitch deck (10 slides)** | [View slides ↓](#-pitch-deck) |
 | 🤖 **AI usage report** | [`ai-usage-report.md`](ai-usage-report.md) |
 
 ---
@@ -29,6 +31,35 @@
 A video explanation of the LiftMind project and its pitch deck: the problem, our solution, the 8 core features, the market and the business model.
 
 [![Watch the video](https://img.shields.io/badge/▶️_Watch_Video-Google_Drive-4285F4?style=for-the-badge&logo=googledrive&logoColor=white)](https://drive.google.com/file/d/1rwQmg61UK3i5lDE699ExW8VrmSaG2Jot/view?usp=sharing)
+
+---
+
+## 📊 Pitch Deck
+
+A 10-slide walkthrough of LiftMind: the problem, our solution, the features, the market and the business model.
+
+<table align="center">
+  <tr>
+    <td align="center" width="50%"><img src="Slide1.PNG" alt="Slide 1" width="100%"><br><sub><b>Slide 1</b></sub></td>
+    <td align="center" width="50%"><img src="Slide2.PNG" alt="Slide 2" width="100%"><br><sub><b>Slide 2</b></sub></td>
+  </tr>
+  <tr>
+    <td align="center" width="50%"><img src="Slide3.PNG" alt="Slide 3" width="100%"><br><sub><b>Slide 3</b></sub></td>
+    <td align="center" width="50%"><img src="Slide4.PNG" alt="Slide 4" width="100%"><br><sub><b>Slide 4</b></sub></td>
+  </tr>
+  <tr>
+    <td align="center" width="50%"><img src="Slide5.PNG" alt="Slide 5" width="100%"><br><sub><b>Slide 5</b></sub></td>
+    <td align="center" width="50%"><img src="Slide6.PNG" alt="Slide 6" width="100%"><br><sub><b>Slide 6</b></sub></td>
+  </tr>
+  <tr>
+    <td align="center" width="50%"><img src="Slide7.PNG" alt="Slide 7" width="100%"><br><sub><b>Slide 7</b></sub></td>
+    <td align="center" width="50%"><img src="Slide8.PNG" alt="Slide 8" width="100%"><br><sub><b>Slide 8</b></sub></td>
+  </tr>
+  <tr>
+    <td align="center" width="50%"><img src="Slide9.PNG" alt="Slide 9" width="100%"><br><sub><b>Slide 9</b></sub></td>
+    <td align="center" width="50%"><img src="Slide10.PNG" alt="Slide 10" width="100%"><br><sub><b>Slide 10</b></sub></td>
+  </tr>
+</table>
 
 ---
 
@@ -129,6 +160,7 @@ python palm_detector.py
 ├── index.html             # Digital Twin web app
 ├── palm_detector.py       # OpenCV + MediaPipe palm-gesture detector
 ├── hand_landmarker.task   # MediaPipe hand landmark model
+├── Slide1.PNG ... Slide10.PNG  # Pitch deck slides
 ├── ai-usage-report.md     # AI tools + prompts used
 ├── LICENSE                # MIT License
 └── README.md
