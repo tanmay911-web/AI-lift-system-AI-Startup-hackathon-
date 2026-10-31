@@ -1,4 +1,4 @@
-[README (1).md](https://github.com/user-attachments/files/34226755/README.1.md)
+
 # LiftMind 🛗🧠
 ### The AI-Powered Retrofit Kit for Smart Elevators
 
