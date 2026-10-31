@@ -1,3 +1,4 @@
+
 # LiftMind 🛗🧠
 ### The AI-Powered Retrofit Kit for Smart Elevators
 
@@ -28,9 +29,7 @@
 
 A video explanation of the LiftMind project and its pitch deck: the problem, our solution, the 8 core features, the market and the business model.
 
-[![Watch the video](https://img.shields.io/badge/▶️_Watch_Video-Google_Drive-4285F4?style=for-the-badge&logo=googledrive&logoColor=white)](https://drive.google.com/file/d/1rwQmg61UK3i5lDE699ExW8VrmSaG2Jot/view?usp=sharing)
-
-▶️ **[Watch the video on Google Drive](YOUR_DRIVE_LINK)**
+[![Watch the video](https://img.shields.io/badge/▶️_Watch_Video-Google_Drive-4285F4?style=for-the-badge&logo=googledrive&logoColor=white)](YOUR_DRIVE_LINK)
 
 ---
 
