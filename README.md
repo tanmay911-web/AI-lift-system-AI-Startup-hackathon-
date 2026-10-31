@@ -1,4 +1,3 @@
-
 # LiftMind 🛗🧠
 ### The AI-Powered Retrofit Kit for Smart Elevators
 
